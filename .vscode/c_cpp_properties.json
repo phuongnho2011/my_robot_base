@@ -10,12 +10,12 @@
                 "/home/phuong/Documents/PlatformIO/Projects/my_robot_mega/src",
                 "/home/phuong/Documents/PlatformIO/Projects/my_robot_mega/lib/ros_lib",
                 "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                 "/home/phuong/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "/home/phuong/.platformio/packages/framework-arduino-avr/variants/mega",
                 "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                 "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                 "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
-                "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                 "/home/phuong/.platformio/packages/tool-unity",
                 ""
             ],
@@ -26,12 +26,12 @@
                     "/home/phuong/Documents/PlatformIO/Projects/my_robot_mega/src",
                     "/home/phuong/Documents/PlatformIO/Projects/my_robot_mega/lib/ros_lib",
                     "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                     "/home/phuong/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "/home/phuong/.platformio/packages/framework-arduino-avr/variants/mega",
                     "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                     "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                     "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
-                    "/home/phuong/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                     "/home/phuong/.platformio/packages/tool-unity",
                     ""
                 ]
