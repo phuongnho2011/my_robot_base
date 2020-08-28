@@ -1,3 +1,6 @@
+#ifndef my_robot_core_config_h
+#define my_robot_core_config_h
+
 #include <Arduino.h>
 #include <ros.h>
 #include <ros/time.h>
@@ -140,3 +143,5 @@
 
 // #define MIN_ANGULAR_VELOCITY -1
 // #define MAX_ANGULAR_VELOCITY 1
+
+#endif

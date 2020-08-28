@@ -1,3 +1,6 @@
+#ifndef my_imu_h
+#define my_imu_h
+
 #include <Arduino.h>
 #include <SoftwareWire.h>
 
@@ -22,3 +25,5 @@ class my_imu
         float _AccErrorX, _AccErrorY, _GyroErrorX, _GyroErrorY, _GyroErrorZ, _AccVErrorX, _AccVErrorY;
         float _elapsedTime, _currentTime, _previousTime;
 };
+
+#endif

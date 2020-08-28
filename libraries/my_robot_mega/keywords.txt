@@ -1,0 +1,24 @@
+#######################################
+# Syntax Coloring Map For SoftwareWire
+####################################### 
+# Datatypes (KEYWORD1)
+#######################################
+
+my_robot_config_base	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+calculate_IMU_error (KEYWORD2)
+calculateIMU (KEYWORD2)
+getVelX (KEYWORD2)
+getVelY (KEYWORD2)
+getroll (KEYWORD2)
+getpitch (KEYWORD2)
+getyaw (KEYWORD2)
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
