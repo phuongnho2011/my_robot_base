@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Wire.h>
+#include <SoftwareWire.h>
 
 class my_imu
 {

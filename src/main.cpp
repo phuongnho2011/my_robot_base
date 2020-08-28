@@ -16,7 +16,6 @@ void setup()
     Serial.begin(19200);
     mpu.imu_init();
     mpu.calculate_IMU_error();
-   
 }
 
 void loop()

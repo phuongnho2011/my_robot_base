@@ -1,0 +1,4 @@
+[submodule "lib/SoftwareWire"]
+	path = lib/SoftwareWire
+	url = https://github.com/Testato/SoftwareWire.git
+	branch = master
