@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <my_imu.h>
 
-SoftwareWire myWire(A0,A1);
+SoftwareWire myWire(A2,A3);
 
 my_imu::my_imu(int addr)
 {
