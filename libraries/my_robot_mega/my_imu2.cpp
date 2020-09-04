@@ -21,8 +21,16 @@ void my_imu::imu_init(void)
 void my_imu::calculate_IMU_error()
 {
     int c = 0;
+   
     while (c < 500)
     {
+        Wire.beginTransmission(_imu_addr);
+        Wire.write(0x3B); // starting with register 0x3B (ACCEL_XOUT_H)
+        Wire.endTransmission(false);
+        Wire.requestFrom(_imu_addr, 6, true); // request a total of 14 registers
+        _AccX = (Wire.read() << 8 | Wire.read()) / 16384.0; // X-axis value
+        _AccY = (Wire.read() << 8 | Wire.read()) / 16384.0; // Y-axis value
+        _AccZ = (Wire.read() << 8 | Wire.read()) / 16384.0; // Z-axis value
         accErrorX = accErrorX + atan(_AccX / sqrt(_AccX * _AccX + _AccZ * _AccZ));
         accErrorY = accErrorY + atan(_AccX / sqrt(_AccY * _AccY + _AccZ * _AccZ));
         accErrorZ = accErrorZ + atan(_AccZ / sqrt(_AccX * _AccX + _AccY * _AccY));
@@ -38,7 +46,7 @@ void my_imu::setupoffsetIMU()
     Wire.beginTransmission(_imu_addr);
     Wire.write(0x3B); // starting with register 0x3B (ACCEL_XOUT_H)
     Wire.endTransmission(false);
-    Wire.requestFrom(_imu_addr, 14, true); // request a total of 14 registers
+    Wire.requestFrom(_imu_addr, 6, true); // request a total of 14 registers
 
     _AccX = (Wire.read() << 8 | Wire.read()) / 16384.0; // X-axis value
     _AccY = (Wire.read() << 8 | Wire.read()) / 16384.0; // Y-axis value
@@ -61,6 +69,10 @@ void my_imu::setupoffsetIMU()
 
 void my_imu::calculateIMU(void)
 {
+    Wire.beginTransmission(_imu_addr);
+    Wire.write(0x3B); // starting with register 0x3B (ACCEL_XOUT_H)
+    Wire.endTransmission(false);
+    Wire.requestFrom(_imu_addr, 14, true); // request a total of 14 registers
     _AccX = (Wire.read() << 8 | Wire.read()) / 16384.0; // X-axis value
     _AccY = (Wire.read() << 8 | Wire.read()) / 16384.0; // Y-axis value
     _AccZ = (Wire.read() << 8 | Wire.read()) / 16384.0; // Z-axis value
