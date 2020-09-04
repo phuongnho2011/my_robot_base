@@ -24,6 +24,8 @@ void loop() {
   updateTime();
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
+  // Call all the callbacks waiting to be called at that point in time
+  nh.spinOnce();
 }
 
 void initJointStates(void)
