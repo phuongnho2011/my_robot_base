@@ -20,6 +20,8 @@ class my_imu
         int _imu_addr;
         double _AccX, _AccY, _AccZ;
         double _GyroX, _GyroY, _GyroZ;
+        double _accAngleX, _accAngleY, _accAngleZ;
+        double gyroXrate, gyroYrate, gyroZrate, dt;
         int16_t _Tmp;
 
         double gyroXangle, gyroYangle, gyroZangle; // Angle calculate using the gyro only

@@ -44,9 +44,9 @@ void my_imu::setupoffsetIMU()
     _AccY = (Wire.read() << 8 | Wire.read()) / 16384.0; // Y-axis value
     _AccZ = (Wire.read() << 8 | Wire.read()) / 16384.0; // Z-axis value
 
-    double _accAngleX = (atan(_AccY / sqrt(pow(_AccX, 2) + pow(_AccZ, 2)))) - accErrorX; // AccErrorX ~(0.58) See the calculate_IMU_error()custom function for more details
-    double _accAngleY = (atan(_AccX / sqrt(pow(_AccY, 2) + pow(_AccZ, 2)))) - accErrorY; // AccErrorY ~(-1.58)
-    double _accAngleZ = (atan(_AccZ / sqrt(pow(_AccX, 2) + pow(_AccY, 2)))) - accErrorZ;
+    _accAngleX = (atan(_AccY / sqrt(pow(_AccX, 2) + pow(_AccZ, 2)))) - accErrorX; // AccErrorX ~(0.58) See the calculate_IMU_error()custom function for more details
+    _accAngleY = (atan(_AccX / sqrt(pow(_AccY, 2) + pow(_AccZ, 2)))) - accErrorY; // AccErrorY ~(-1.58)
+    _accAngleZ = (atan(_AccZ / sqrt(pow(_AccX, 2) + pow(_AccY, 2)))) - accErrorZ;
 
     gyroXangle = _accAngleX;
     gyroYangle = _accAngleY;
@@ -69,16 +69,16 @@ void my_imu::calculateIMU(void)
     _GyroY = (Wire.read() << 8 | Wire.read()) / 131.0;
     _GyroZ = (Wire.read() << 8 | Wire.read()) / 131.0;
 
-    double dt = (double)(micros() - timer) / 1000000; // Calculate delta time
+    dt = (double)(micros() - timer) / 1000000; // Calculate delta time
     timer = micros();
 
-    double _accAngleX = (atan(_AccY / sqrt(pow(_AccX, 2) + pow(_AccZ, 2)))) - accErrorX; // AccErrorX ~(0.58) See the calculate_IMU_error()custom function for more details
-    double _accAngleY = (atan(_AccX / sqrt(pow(_AccY, 2) + pow(_AccZ, 2)))) - accErrorY; // AccErrorY ~(-1.58)
-    double _accAngleZ = (atan(_AccZ / sqrt(pow(_AccX, 2) + pow(_AccY, 2)))) - accErrorZ;
+    _accAngleX = (atan(_AccY / sqrt(pow(_AccX, 2) + pow(_AccZ, 2)))) - accErrorX; // AccErrorX ~(0.58) See the calculate_IMU_error()custom function for more details
+    _accAngleY = (atan(_AccX / sqrt(pow(_AccY, 2) + pow(_AccZ, 2)))) - accErrorY; // AccErrorY ~(-1.58)
+    _accAngleZ = (atan(_AccZ / sqrt(pow(_AccX, 2) + pow(_AccY, 2)))) - accErrorZ;
 
-    double gyroXrate = _GyroX * PI / 180;
-    double gyroYrate = _GyroY * PI / 180;
-    double gyroZrate = _GyroZ * PI / 180;
+    gyroXrate = _GyroX * PI / 180;
+    gyroYrate = _GyroY * PI / 180;
+    gyroZrate = _GyroZ * PI / 180;
 
     gyroXangle += gyroXrate * dt; // Calculate gyro angle without any filter
     gyroYangle += gyroYrate * dt;
