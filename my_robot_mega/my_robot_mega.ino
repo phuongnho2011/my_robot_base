@@ -6,7 +6,7 @@ my_imu mpu(0x68);
 void setup() {
   
   nh.initNode();
-  nh.getHardware()->setBaud(115200);
+//  nh.getHardware()->setBaud(115200);
 
   nh.advertise(odom_pub);
   nh.advertise(joint_states_pub);
