@@ -49,6 +49,7 @@ void setup() {
 void loop() {
   Motor_right(w_r*10);
   Motor_left(w_l*10);
+  imu.calculateIMU();
   sprintf(log_msg, "compAngleX [%f]", imu.getcompAngleX());
   nh.loginfo(log_msg);
   sprintf(log_msg, "compAngleY [%f]", imu.getcompAngleY());
