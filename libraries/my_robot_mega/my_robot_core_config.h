@@ -43,33 +43,45 @@
 #define LINEAR          0                       /*!< Linear velocity index */
 #define ANGULAR         1                       /*!< Angular velocity index */
 
+/*******************************************************************************
+* ROS Parameter
+*******************************************************************************/
+char get_prefix[10];
+char* get_tf_prefix = get_prefix;
+
+char odom_header_frame_id[30];
+char odom_child_frame_id[30];
+char imu_frame_id[30];
+char joint_state_header_frame_id[30];
+
 // void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg);
 // void resetCallback(const std_msgs::Empty& reset_msg);
 // void publishCmdVelFromAMEGA(void);
 
-// ros::Time rosNow(void);
+ros::Time rosNow(void);
 
-// void updateVariable(bool isConnected);
+void updateVariable(bool isConnected);
 // void updateMotorInfo(int32_t left_tick, int32_t right_tick);
-// void updateTime(void);
-// void updateOdometry(void);
-// void updateJoint(void);
-// void updateTF(geometry_msgs::TransformStamped& odom_tf);
+void updateTime(void);
+void updateOdometry(void);
+void updateJointStates(void);
+void updateTF(geometry_msgs::TransformStamped& odom_tf);
+void publishDriveInformation(void);
 // void updateGyroCali(bool isConnected);
 // void updateGoalVelocity(void);
 // void updateTFPrefix(bool isConnected);
 
-// void initOdom(void);
-// void initJointStates(void);
+void initOdom(void);
+void initJointStates(void);
 
-// bool calcOdometry(double diff_time);
+bool calcOdometry(double diff_time);
 
 // void sendLogMsg(void);
 // void waitForSerialLink(bool isConnected);
 
-// ros::NodeHandle nh;
-// ros::Time current_time;
-// uint32_t current_offset;
+ros::NodeHandle nh;
+ros::Time current_time;
+uint32_t current_offset;
 
 // ros::Subscriber<geometry_msgs::Twist> cmd_vel_sub("cmd_vel", commandVelocityCallback);
 
@@ -77,25 +89,25 @@
 // geometry_msgs::Twist cmd_vel_amega_msg;
 // ros::Publisher cmd_vel_amega_pub("cmd_vel_amega", &cmd_vel_amega_msg);
 
-// // Odometry of Turtlebot3
-// nav_msgs::Odometry odom;
-// ros::Publisher odom_pub("odom", &odom);
+// Odometry of my_robot
+nav_msgs::Odometry odom;
+ros::Publisher odom_pub("odom", &odom);
 
-// // Joint(Dynamixel) state of Turtlebot3
-// sensor_msgs::JointState joint_states;
-// ros::Publisher joint_states_pub("joint_states", &joint_states);
+// Joint(Dynamixel) state of my_robot
+sensor_msgs::JointState joint_states;
+ros::Publisher joint_states_pub("joint_states", &joint_states);
 
-// /*******************************************************************************
-// * Transform Broadcaster
-// *******************************************************************************/
-// // TF of Turtlebot3
-// geometry_msgs::TransformStamped odom_tf;
-// tf::TransformBroadcaster tf_broadcaster;
+/*******************************************************************************
+* Transform Broadcaster
+*******************************************************************************/
+// TF of Turtlebot3
+geometry_msgs::TransformStamped odom_tf;
+tf::TransformBroadcaster tf_broadcaster;
 
 // /*******************************************************************************
 // * SoftwareTimer of Turtlebot3
 // *******************************************************************************/
-// static uint32_t tTime[10];
+static uint32_t tTime[10];
 
 // /*******************************************************************************
 // * Calculation for odometry
@@ -109,25 +121,14 @@
 // *******************************************************************************/
 // double  last_velocity[WHEEL_NUM]  = {0.0, 0.0};
 
-// /*******************************************************************************
-// * Declaration for SLAM and navigation
-// *******************************************************************************/
-// unsigned long prev_update_time;
-// float odom_pose[3];
-// double odom_vel[3];
+/*******************************************************************************
+* Declaration for SLAM and navigation
+*******************************************************************************/
+unsigned long prev_update_time;
+float odom_pose[3];
+double odom_vel[3];
 
-// /*******************************************************************************
-// * ROS Parameter
-// *******************************************************************************/
-// char get_prefix[10];
-// char* get_tf_prefix = get_prefix;
 
-// char odom_header_frame_id[30];
-// char odom_child_frame_id[30];
-
-// char imu_frame_id[30];
-
-// char joint_state_header_frame_id[30];
 
 // /*******************************************************************************
 // * Declaration for controllers
