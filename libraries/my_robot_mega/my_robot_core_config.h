@@ -16,7 +16,7 @@
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
-#include <my_imu.h>
+#include <my_imu2.h>
 
 /* Time update index */
 #define CONTROL_MOTOR_TIME_INDEX                0       /*!< Time index control motor */

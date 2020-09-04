@@ -1,185 +1,117 @@
-#include <my_imu.h>
+#include <my_imu2.h>
 #include <my_robot_core_config.h>
 
-my_imu mpu(0x68);
+#define EN_R 5
+#define EN_L 6
+
+#define INT1_R 7
+#define INT2_R 11
+
+#define INT1_L 12
+#define INT2_L 13
+
+char log_msg[50];
+
+my_imu imu(0x68);
+
+double w_r = 0, w_l = 0;
+//wheel_rad is the wheel radius ,wheel_sep is
+double wheel_rad = 0.0275, wheel_sep = 0.360;
+int lowSpeed = 200;
+int highSpeed = 50; 
+double speed_ang = 0, speed_lin = 0;
+
+//Motor_initalization
+void Motor_init();
+
+//Control_Motor
+void Motor_right(int Pulse_Width);
+void Motor_left(int Pulse_Width);
+
+void messageCb( const geometry_msgs::Twist& msg) {
+  speed_ang = msg.angular.z;
+  speed_lin = msg.linear.x;
+  w_r = (speed_lin / wheel_rad) + ((speed_ang * wheel_sep) / (2.0 * wheel_rad));
+  w_l = (speed_lin / wheel_rad) - ((speed_ang * wheel_sep) / (2.0 * wheel_rad));
+}
+
+ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", &messageCb );
 
 void setup() {
-  
+  Motor_init();
   nh.initNode();
-//  nh.getHardware()->setBaud(115200);
-
-  nh.advertise(odom_pub);
-  nh.advertise(joint_states_pub);
-
-  tf_broadcaster.init(nh);
-
-  initOdom();
-
-  initJointStates();
-  
+  nh.subscribe(sub);
+  imu.imu_init();
+  imu.setupoffsetIMU();
+  imu.calculate_IMU_error();
 }
 
 void loop() {
-  uint32_t t = millis();
-  updateTime();
-  updateVariable(nh.connected());
-  updateTFPrefix(nh.connected());
-  // Call all the callbacks waiting to be called at that point in time
+  Motor_right(w_r*10);
+  Motor_left(w_l*10);
+  sprintf(log_msg, "compAngleX [%f]", imu.getcompAngleX());
+  nh.loginfo(log_msg);
+  sprintf(log_msg, "compAngleY [%f]", imu.getcompAngleY());
+  nh.loginfo(log_msg);
+  sprintf(log_msg, "compAngleZ [%f]", imu.getcompAngleZ());
+  nh.loginfo(log_msg);
   nh.spinOnce();
 }
 
-void initJointStates(void)
+void Motor_init()
 {
-  static char *joint_states_name[] = {(char*)"wheel_left_joint", (char*)"wheel_right_joint"};
+  pinMode(2,INPUT_PULLUP);//chan ngat encoder
+  pinMode(4,INPUT_PULLUP);//chan doc encoder
 
-  joint_states.header.frame_id = joint_state_header_frame_id;
-  joint_states.name            = joint_states_name;
+  pinMode(EN_R,OUTPUT);//chan pwm
+  pinMode(INT1_R,OUTPUT);//chan DIR1
+  pinMode(INT2_R,OUTPUT);//chan DIR2
 
-  joint_states.name_length     = WHEEL_NUM;
-  joint_states.position_length = WHEEL_NUM;
-  joint_states.velocity_length = WHEEL_NUM;
-  joint_states.effort_length   = WHEEL_NUM;
+  pinMode(EN_L,OUTPUT);//chan pwm
+  pinMode(INT1_L,OUTPUT);//chan DIR1
+  pinMode(INT2_L,OUTPUT);//chan DIR2
 }
 
-void updateTime()
+void Motor_right(int Pulse_Width)
 {
-  current_offset = millis();
-  current_time = nh.now();
-}
-
-void updateOdometry(void)
-{
-
-}
-void updateJointState(void)
-{
-
-}
-void updateTF(geometry_msgs::TransformStamped& odom_tf)
-{
-
-}
-
-void publishDriveInformation(void)
-{
-  unsigned long time_now = millis();
-  unsigned long step_time = time_now - prev_update_time;
-
-  prev_update_time = time_now;
-  ros::Time stamp_now = rosNow();
-
-  // calculate odometry
-  calcOdometry((double)(step_time * 0.001));
-
-  // odometry
-  updateOdometry();
-  odom.header.stamp = stamp_now;
-  odom_pub.publish(&odom);
-
-  // odometry tf
-  updateTF(odom_tf);
-  odom_tf.header.stamp = stamp_now;
-  tf_broadcaster.sendTransform(odom_tf);
-
-  // joint states
-  updateJointStates();
-  joint_states.header.stamp = stamp_now;
-  joint_states_pub.publish(&joint_states);  
-}
-
-/*******************************************************************************
-* Update TF Prefix
-*******************************************************************************/
-void updateTFPrefix(bool isConnected)
-{
-  static bool isChecked = false;
-  char log_msg[50];
-
-  if (isConnected)
+  if (Pulse_Width > 0)
   {
-    if (isChecked == false)
-    {
-      nh.getParam("~tf_prefix", &get_tf_prefix);
-
-      if (!strcmp(get_tf_prefix, ""))
-      {
-        sprintf(odom_header_frame_id, "odom");
-        sprintf(odom_child_frame_id, "base_footprint");  
-        sprintf(joint_state_header_frame_id, "base_link");
-      }
-      else
-      {
-        strcpy(odom_header_frame_id, get_tf_prefix);
-        strcpy(odom_child_frame_id, get_tf_prefix);
-
-        strcpy(joint_state_header_frame_id, get_tf_prefix);
-
-        strcat(odom_header_frame_id, "/odom");
-        strcat(odom_child_frame_id, "/base_footprint");
-
-        strcat(joint_state_header_frame_id, "/base_link");
-      }
-
-      sprintf(log_msg, "Setup TF on Odometry [%s]", odom_header_frame_id);
-      nh.loginfo(log_msg); 
-
-      sprintf(log_msg, "Setup TF on JointState [%s]", joint_state_header_frame_id);
-      nh.loginfo(log_msg); 
-
-      isChecked = true;
-    }
+    analogWrite(EN_R,Pulse_Width);
+    digitalWrite(INT1_R, LOW);
+    digitalWrite(INT2_R,HIGH);
+  }
+  else if (Pulse_Width < 0)
+  {
+    analogWrite(EN_R,abs(Pulse_Width));
+    digitalWrite(INT1_R,HIGH);
+    digitalWrite(INT2_R,LOW); 
   }
   else
   {
-    isChecked = false;
+    analogWrite(EN_R,Pulse_Width);
+    digitalWrite(INT1_R,LOW);
+    digitalWrite(INT2_R,LOW);
   }
 }
 
-/*******************************************************************************
-* Initialization odometry data
-*******************************************************************************/
-void initOdom(void)
+void Motor_left(int Pulse_Width)
 {
-//  init_encoder = true;
-
-  for (int index = 0; index < 3; index++)
+  if (Pulse_Width > 0)
   {
-    odom_pose[index] = 0.0;
-    odom_vel[index]  = 0.0;
+    analogWrite(EN_L,Pulse_Width);
+    digitalWrite(INT1_L, LOW);
+    digitalWrite(INT2_L,HIGH);
   }
-
-  odom.pose.pose.position.x = 0.0;
-  odom.pose.pose.position.y = 0.0;
-  odom.pose.pose.position.z = 0.0;
-
-  odom.pose.pose.orientation.x = 0.0;
-  odom.pose.pose.orientation.y = 0.0;
-  odom.pose.pose.orientation.z = 0.0;
-  odom.pose.pose.orientation.w = 0.0;
-
-  odom.twist.twist.linear.x  = 0.0;
-  odom.twist.twist.angular.z = 0.0;
-}
-
-/*******************************************************************************
-* Update variable (initialization)
-*******************************************************************************/
-void updateVariable(bool isConnected)
-{
-  static bool variable_flag = false;
-  
-  if (isConnected)
+  else if (Pulse_Width < 0)
   {
-    if (variable_flag == false)
-    {      
-//      sensors.initIMU();
-      initOdom();
-
-      variable_flag = true;
-    }
+    analogWrite(EN_L,abs(Pulse_Width));
+    digitalWrite(INT1_L,HIGH);
+    digitalWrite(INT2_L,LOW); 
   }
   else
   {
-    variable_flag = false;
+    analogWrite(EN_L,Pulse_Width);
+    digitalWrite(INT1_L,LOW);
+    digitalWrite(INT2_L,LOW);
   }
 }
