@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <my_imu2.h>
 
-SoftwareWire myWire(A2, A3);
+// SoftwareWire Wire(A2, A3);
 
 my_imu::my_imu(int addr)
 {
@@ -10,11 +10,11 @@ my_imu::my_imu(int addr)
 
 void my_imu::imu_init(void)
 {
-    myWire.begin();                      // Initialize comunication
-    myWire.beginTransmission(_imu_addr); // Start communication with MPU6050 // MPU=0x68
-    myWire.write(0x6B);                  // Talk to the register 6B
-    myWire.write(0x00);                  // Make reset - place a 0 into the 6B register
-    myWire.endTransmission(true);        // end the transmission
+    Wire.begin();                      // Initialize comunication
+    Wire.beginTransmission(_imu_addr); // Start communication with MPU6050 // MPU=0x68
+    Wire.write(0x6B);                  // Talk to the register 6B
+    Wire.write(0x00);                  // Make reset - place a 0 into the 6B register
+    Wire.endTransmission(true);        // end the transmission
     delay(20);
 }
 
@@ -35,14 +35,14 @@ void my_imu::calculate_IMU_error()
 
 void my_imu::setupoffsetIMU()
 {
-    myWire.beginTransmission(_imu_addr);
-    myWire.write(0x3B); // starting with register 0x3B (ACCEL_XOUT_H)
-    myWire.endTransmission(false);
-    myWire.requestFrom(_imu_addr, 14, true); // request a total of 14 registers
+    Wire.beginTransmission(_imu_addr);
+    Wire.write(0x3B); // starting with register 0x3B (ACCEL_XOUT_H)
+    Wire.endTransmission(false);
+    Wire.requestFrom(_imu_addr, 14, true); // request a total of 14 registers
 
-    _AccX = (myWire.read() << 8 | myWire.read()) / 16384.0; // X-axis value
-    _AccY = (myWire.read() << 8 | myWire.read()) / 16384.0; // Y-axis value
-    _AccZ = (myWire.read() << 8 | myWire.read()) / 16384.0; // Z-axis value
+    _AccX = (Wire.read() << 8 | Wire.read()) / 16384.0; // X-axis value
+    _AccY = (Wire.read() << 8 | Wire.read()) / 16384.0; // Y-axis value
+    _AccZ = (Wire.read() << 8 | Wire.read()) / 16384.0; // Z-axis value
 
     double _accAngleX = (atan(_AccY / sqrt(pow(_AccX, 2) + pow(_AccZ, 2)))) - accErrorX; // AccErrorX ~(0.58) See the calculate_IMU_error()custom function for more details
     double _accAngleY = (atan(_AccX / sqrt(pow(_AccY, 2) + pow(_AccZ, 2)))) - accErrorY; // AccErrorY ~(-1.58)
@@ -61,13 +61,13 @@ void my_imu::setupoffsetIMU()
 
 void my_imu::calculateIMU(void)
 {
-    _AccX = (myWire.read() << 8 | myWire.read()) / 16384.0; // X-axis value
-    _AccY = (myWire.read() << 8 | myWire.read()) / 16384.0; // Y-axis value
-    _AccZ = (myWire.read() << 8 | myWire.read()) / 16384.0; // Z-axis value
-    _Tmp = myWire.read() << 8 | myWire.read();              // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
-    _GyroX = (myWire.read() << 8 | myWire.read()) / 131.0;  // For a 250deg/s range we have to divide first the raw value by 131.0, according to the datasheet
-    _GyroY = (myWire.read() << 8 | myWire.read()) / 131.0;
-    _GyroZ = (myWire.read() << 8 | myWire.read()) / 131.0;
+    _AccX = (Wire.read() << 8 | Wire.read()) / 16384.0; // X-axis value
+    _AccY = (Wire.read() << 8 | Wire.read()) / 16384.0; // Y-axis value
+    _AccZ = (Wire.read() << 8 | Wire.read()) / 16384.0; // Z-axis value
+    _Tmp = Wire.read() << 8 | Wire.read();              // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+    _GyroX = (Wire.read() << 8 | Wire.read()) / 131.0;  // For a 250deg/s range we have to divide first the raw value by 131.0, according to the datasheet
+    _GyroY = (Wire.read() << 8 | Wire.read()) / 131.0;
+    _GyroZ = (Wire.read() << 8 | Wire.read()) / 131.0;
 
     double dt = (double)(micros() - timer) / 1000000; // Calculate delta time
     timer = micros();
