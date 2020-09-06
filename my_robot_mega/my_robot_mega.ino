@@ -1,25 +1,43 @@
 #include <my_imu2.h>
 #include <my_robot_core_config.h>
 
+#define EN_L 4
 #define EN_R 5
-#define EN_L 6
 
-#define INT1_R 7
-#define INT2_R 11
+#define INT1_L 23
+#define INT2_L 25
 
-#define INT1_L 12
-#define INT2_L 13
+#define INT1_R 27
+#define INT2_R 29
+
+#define A1 2
+#define B1 39
+
+#define A2 3
+#define B2 41
+
+#define SAMPLE_DELAY 1000
+#define PULSES_PER_TURN 181.5
+
+unsigned int lastTime;
+float rpm;
+volatile unsigned int pulseL ,pulseR;
 
 char log_msg[50];
+char result[8];
 
-my_imu imu(0x68);
+unsigned long previousTime = 0;
+unsigned long Time;
+float velocity;
 
 double w_r = 0, w_l = 0;
 //wheel_rad is the wheel radius ,wheel_sep is
 double wheel_rad = 0.0275, wheel_sep = 0.360;
+ros::NodeHandle nh;
 int lowSpeed = 200;
 int highSpeed = 50; 
 double speed_ang = 0, speed_lin = 0;
+
 
 //Motor_initalization
 void Motor_init();
@@ -27,6 +45,9 @@ void Motor_init();
 //Control_Motor
 void Motor_right(int Pulse_Width);
 void Motor_left(int Pulse_Width);
+void Count_Left();
+void Count_Right();
+void Calculate_Velocity();
 
 void messageCb( const geometry_msgs::Twist& msg) {
   speed_ang = msg.angular.z;
@@ -39,30 +60,31 @@ ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", &messageCb );
 
 void setup() {
   Motor_init();
-  nh.initNode();
-  nh.subscribe(sub);
-  imu.imu_init();
-  imu.setupoffsetIMU();
-  imu.calculate_IMU_error();
+//  nh.initNode();
+//  nh.subscribe(sub);
+  attachInterrupt(digitalPinToInterrupt(A1),Count_Left,CHANGE);
+  Serial.begin(9600);
 }
 
 void loop() {
-  Motor_right(w_r*10);
-  Motor_left(w_l*10);
-  imu.calculateIMU();
-  sprintf(log_msg, "compAngleX [%f]", imu.getcompAngleX());
-  nh.loginfo(log_msg);
-  sprintf(log_msg, "compAngleY [%f]", imu.getcompAngleY());
-  nh.loginfo(log_msg);
-  sprintf(log_msg, "compAngleZ [%f]", imu.getcompAngleZ());
-  nh.loginfo(log_msg);
-  nh.spinOnce();
+//  Motor_right(w_r*10);
+//  Motor_left(w_l*10);
+//  nh.spinOnce();
+  Motor_left(0);
+  Calculate_Velocity();
+//  dtostrf(velocity,3,5,result);
+//  sprintf(log_msg, "tocdo L: [%s]", result);
+//  nh.loginfo(log_msg);
+//  nh.spinOnce();
+  Serial.println(rpm);
 }
 
 void Motor_init()
 {
-  pinMode(2,INPUT_PULLUP);//chan ngat encoder
-  pinMode(4,INPUT_PULLUP);//chan doc encoder
+  pinMode(A1,INPUT_PULLUP);//chan ngat encoder
+  pinMode(B1,INPUT_PULLUP);//chan doc encoder
+  pinMode(A2,INPUT_PULLUP);//chan ngat encoder
+  pinMode(B2,INPUT_PULLUP);//chan doc encoder
 
   pinMode(EN_R,OUTPUT);//chan pwm
   pinMode(INT1_R,OUTPUT);//chan DIR1
@@ -114,5 +136,44 @@ void Motor_left(int Pulse_Width)
     analogWrite(EN_L,Pulse_Width);
     digitalWrite(INT1_L,LOW);
     digitalWrite(INT2_L,LOW);
+  }
+}
+
+void Count_Left()
+{
+  if(digitalRead(B1)==LOW)
+     ++pulseL;
+}
+
+//void Count_Right()
+//{
+//  if(digitalRead(B2)==LOW)
+//     pulseL++;
+//   else
+//     pulseL--;
+//}
+
+//void Calculate_Velocity()
+//{
+//  if((Time - previousTime) == 1000)
+//  {
+//    previousTime = Time;
+//    velocity = pulseL;
+//    pulseL = 0;
+//  }
+//}
+
+void Calculate_Velocity()
+{
+  if((unsigned int)millis() - lastTime >= SAMPLE_DELAY)
+  {
+    unsigned int pulses;
+    noInterrupts();
+    pulses = pulseL;
+    pulseL = 0;
+    interrupts();
+
+    rpm = (pulses * (60000.f / ((unsigned int)millis() - lastTime))) / PULSES_PER_TURN;
+    lastTime = (unsigned int)millis();
   }
 }
