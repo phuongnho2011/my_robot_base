@@ -8,7 +8,7 @@ my_imu::my_imu(int addr)
     _imu_addr = addr;
 }
 
-void my_imu::imu_init(void)
+void my_imu::init(void)
 {
     Wire.begin();                      // Initialize comunication
     Wire.beginTransmission(_imu_addr); // Start communication with MPU6050 // MPU=0x68

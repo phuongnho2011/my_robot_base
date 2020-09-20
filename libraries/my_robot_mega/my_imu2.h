@@ -8,7 +8,7 @@ class my_imu
 {
     public:
         my_imu(int);
-        void imu_init(void);
+        void init(void);
         void calculate_IMU_error(void);
         void calculateIMU(void);
         double getcompAngleX();
