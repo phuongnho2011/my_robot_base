@@ -42,11 +42,11 @@ void loop() {
     updateGoalVelocity();
     if((t - tTime[6]) > CONTROL_MOTOR_TIMEOUT)
     {
-      mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,zero_velocity)
+      mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,zero_velocity);
     }
     else
     {
-      mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,goal_velocity)
+      mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,goal_velocity);
     }
     tTime[0] = t;
   }
