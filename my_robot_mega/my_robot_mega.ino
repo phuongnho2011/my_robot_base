@@ -276,3 +276,23 @@ bool calcOdometry(double diff_time)
   odom_vel[1] = 0.0;
   odom_vel[2] = w;
 }
+
+ros::Time rosNow()
+{
+  return nh.now();
+}
+
+void updateJointStates(void)
+{
+  static float joint_states_pos[WHEEL_NUM] = {0.0, 0.0};
+  static float joint_states_vel[WHEEL_NUM] = {0.0, 0.0};
+
+  joint_states_pos[LEFT]  = last_rad[LEFT];
+  joint_states_pos[RIGHT] = last_rad[RIGHT];
+
+  joint_states_vel[LEFT]  = last_velocity[LEFT];
+  joint_states_vel[RIGHT] = last_velocity[RIGHT];
+
+  joint_states.position = joint_states_pos;
+  joint_states.velocity = joint_states_vel;
+}

@@ -42,6 +42,8 @@
 #define LINEAR          0                       /*!< Linear velocity index */
 #define ANGULAR         1                       /*!< Angular velocity index */
 
+#define TICK2RAD                         0.001533981  // 0.087890625[deg] * 3.14159265359 / 180 = 0.001533981f
+
 #define MIN_LINEAR_VELOCITY -2 
 #define MAX_LINEAR_VELOCITY  2
 
@@ -119,17 +121,17 @@ tf::TransformBroadcaster tf_broadcaster;
 // *******************************************************************************/
 static uint32_t tTime[10];
 
-// /*******************************************************************************
-// * Calculation for odometry
-// *******************************************************************************/
-// bool init_encoder = true;
-// int32_t last_diff_tick[WHEEL_NUM] = {0, 0};
-// double  last_rad[WHEEL_NUM]       = {0.0, 0.0};
+/*******************************************************************************
+* Calculation for odometry
+*******************************************************************************/
+bool init_encoder = true;
+int32_t last_diff_tick[WHEEL_NUM] = {0, 0};
+double  last_rad[WHEEL_NUM]       = {0.0, 0.0};
 
-// /*******************************************************************************
-// * Update Joint State
-// *******************************************************************************/
-// double  last_velocity[WHEEL_NUM]  = {0.0, 0.0};
+/*******************************************************************************
+* Update Joint State
+*******************************************************************************/
+double  last_velocity[WHEEL_NUM]  = {0.0, 0.0};
 
 /*******************************************************************************
 * Declaration for SLAM and navigation
