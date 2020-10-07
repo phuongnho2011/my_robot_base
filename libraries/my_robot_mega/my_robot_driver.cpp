@@ -19,6 +19,9 @@ void motor_driver::init()
     pinMode(EN_L, OUTPUT);   //chan pwm
     pinMode(INT1_L, OUTPUT); //chan DIR1
     pinMode(INT2_L, OUTPUT); //chan DIR2
+
+    attachInterrupt(digitalPinToInterrupt(A1),Count_Left,CHANGE);
+    attachInterrupt(digitalPinToInterrupt(A2),Count_Right,CHANGE);
 }
 
 void motor_driver::motor_Right(int Pulse_Width)
@@ -66,6 +69,11 @@ void motor_driver::motor_Left(int Pulse_Width)
 }
 
 void motor_driver::cal_Velocity()
+{
+    
+}
+
+void motor_driver::readEncoder(int32_t &left_value, int32_t &right_value)
 {
     
 }
