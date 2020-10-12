@@ -42,7 +42,7 @@
 #define LINEAR          0                       /*!< Linear velocity index */
 #define ANGULAR         1                       /*!< Angular velocity index */
 
-#define TICK2RAD                         0.001533981  // 0.087890625[deg] * 3.14159265359 / 180 = 0.001533981f
+#define PULSE2RAD                         0.005099988  // 1[pulse] * 3.14159265359 / 1232 = 0.001533981f
 
 #define MIN_LINEAR_VELOCITY -2 
 #define MAX_LINEAR_VELOCITY  2
@@ -50,8 +50,8 @@
 #define MIN_ANGULAR_VELOCITY -1
 #define MAX_ANGULAR_VELOCITY 1
 
-#define WHEEL_RADIUS 0.033 //meter
-#define WHEEL_SEPRATION 0.287 //meter
+#define WHEEL_RADIUS 0.0275 //meter
+#define WHEEL_SEPRATION 0.318 //meter
 
 /*******************************************************************************
 * ROS Parameter
@@ -73,7 +73,7 @@ ros::Subscriber<geometry_msgs::Twist> cmd_vel_sub("cmd_vel", commandVelocityCall
 ros::Time rosNow(void);
 
 void updateVariable(bool isConnected);
-// void updateMotorInfo(int32_t left_tick, int32_t right_tick);
+void updateMotorInfo(int32_t left_pulse, int32_t right_pulse);
 void updateTime(void);
 void updateOdometry(void);
 void updateJointStates(void);
@@ -125,7 +125,7 @@ static uint32_t tTime[10];
 * Calculation for odometry
 *******************************************************************************/
 bool init_encoder = true;
-int32_t last_diff_tick[WHEEL_NUM] = {0, 0};
+int32_t last_diff_pulse[WHEEL_NUM] = {0, 0};
 double  last_rad[WHEEL_NUM]       = {0.0, 0.0};
 
 /*******************************************************************************

@@ -20,8 +20,8 @@ void motor_driver::init()
     pinMode(INT1_L, OUTPUT); //chan DIR1
     pinMode(INT2_L, OUTPUT); //chan DIR2
 
-    attachInterrupt(digitalPinToInterrupt(A1),Count_Left,CHANGE);
-    attachInterrupt(digitalPinToInterrupt(A2),Count_Right,CHANGE);
+    attachInterrupt(digitalPinToInterrupt(A1),cal_encoderL,CHANGE);
+    attachInterrupt(digitalPinToInterrupt(A2),cal_encoderL,CHANGE);
 }
 
 void motor_driver::motor_Right(int Pulse_Width)
@@ -73,9 +73,72 @@ void motor_driver::cal_Velocity()
     
 }
 
-void motor_driver::readEncoder(int32_t &left_value, int32_t &right_value)
+void motor_driver::read_EncoderL()
 {
-    
+    if ( digitalRead(B1) == 0 ) 
+    {
+        if ( digitalRead(A1) == 0 ) 
+        {
+            // A fell, B is low
+            pulsesL--; // Moving forward
+        } 
+        else 
+        {
+            // A rose, B is high
+            pulsesL++; // Moving reverse
+        }
+    } 
+    else 
+    {
+        if ( digitalRead(A1) == 0 ) 
+        {
+            pulsesL++; // Moving reverse
+        } 
+        else 
+        {
+            // A rose, B is low
+            pulsesL--; // Moving forward
+        }
+    }
+}
+
+void motor_driver::read_EncoderR()
+{
+    if ( digitalRead(B1) == 0 ) 
+    {
+        if ( digitalRead(A1) == 0 ) 
+        {
+            // A fell, B is low
+            pulsesL--; // Moving forward
+        } 
+        else
+        {
+            // A rose, B is high
+            pulsesL++; // Moving reverse
+        }
+    } 
+    else 
+    {
+        if ( digitalRead(A1) == 0 ) 
+        {
+            pulsesL++; // Moving reverse
+        } 
+        else 
+        {
+            // A rose, B is low
+            pulsesL--; // Moving forward
+        }
+    }
+}
+
+int32_t motor_driver::getLeftencoder()
+{
+    return pulsesL;
+}
+
+int32_t motor_driver::getRightencoder()
+{
+    return pulsesR;
 }
 
 void motor_driver::control_Motor(const float wheel_rad, const float wheel_sep,float* cmd_value)

@@ -53,6 +53,8 @@ void loop() {
   
   if ((t-tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
   {
+
+    updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
     publishDriveInformation();
     tTime[2] = t;
   }
@@ -184,7 +186,7 @@ void updateTFPrefix(bool isConnected)
 *******************************************************************************/
 void initOdom(void)
 {
-//  init_encoder = true;
+  init_encoder = true;
 
   for (int index = 0; index < 3; index++)
   {
@@ -261,7 +263,18 @@ bool calcOdometry(double diff_time)
 
   if (step_time == 0)
     return false;
+
+  wheel_l = PULSE2RAD*(double)last_diff_pulse[LEFT];
+  wheel_r = PULSE2RAD*(double)last_diff_pulse[RIGHT];
   
+  if(isnan(wheel_l))
+    wheel_l = 0.0;
+
+  if(isnan(wheel_r))
+    wheel_r = 0.0;
+
+  delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
+
     // compute odometric pose
   odom_pose[0] += delta_s * cos(odom_pose[2] + (delta_theta / 2.0));
   odom_pose[1] += delta_s * sin(odom_pose[2] + (delta_theta / 2.0));
@@ -275,6 +288,12 @@ bool calcOdometry(double diff_time)
   odom_vel[0] = v;
   odom_vel[1] = 0.0;
   odom_vel[2] = w;
+
+  last_velocity[LEFT]  = wheel_l / step_time;
+  last_velocity[RIGHT] = wheel_r / step_time;
+  last_theta = theta;
+
+  return true;
 }
 
 ros::Time rosNow()
@@ -295,4 +314,49 @@ void updateJointStates(void)
 
   joint_states.position = joint_states_pos;
   joint_states.velocity = joint_states_vel;
+}
+
+void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
+{
+  int32_t current_pulse = 0;
+  static int32_t last_pulse[WHEEL_NUM] = {0, 0};
+
+  if(init_encoder)
+  {
+    for(int index = 0; index < WHEEL_NUM; index++)
+    {
+      last_diff_pulse[index] = 0;
+      last_pulse[index] = 0;
+      last_rad[index] = 0.0;
+
+      last_velocity[index] = 0.0;
+    }
+
+    last_pulse[LEFT] = left_pulse;
+    last_pulse[RIGHT] = right_pulse;
+    init_encoder = false;
+    return;
+  }
+
+  current_pulse = left_pulse;
+
+  last_diff_pulse[LEFT] = current_pulse - last_pulse[LEFT];
+  last_pulse[LEFT]      = current_pulse;
+  last_rad[LEFT]       += PULSE2RAD * (double)last_diff_pulse[LEFT];
+
+  current_pulse = right_pulse;
+
+  last_diff_pulse[RIGHT] = current_pulse - last_pulse[RIGHT];
+  last_pulse[RIGHT]      = current_pulse;
+  last_rad[RIGHT]       += PULSE2RAD * (double)last_diff_pulse[RIGHT];
+}
+
+void motor_driver::cal_encoderL()
+{
+  mt_driver.read_EncoderL();
+}
+
+void motor_driver::cal_encoderR()
+{
+  mt_driver.read_EncoderR();
 }

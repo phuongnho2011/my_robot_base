@@ -33,14 +33,18 @@ class motor_driver
         void motor_Left(int);
         void cal_Velocity(void);
         void control_Motor(const float wheel_rad, const float wheel_sep,float* cmd_value);
-        void readEncoder(int32_t &left_value, int32_t &right_value);
+        void read_EncoderL();
+        static void cal_encoderL();
+        void read_EncoderR();
+        static void cal_encoderR();
+        int32_t getLeftencoder();
+        int32_t getRightencoder();
     private:
         unsigned int lastTime;
         float rpm;
-        volatile unsigned int pulseL, pulseR;
+        int32_t pulsesL, pulsesR;
         unsigned long previousTime = 0;
-        unsigned long Time;
-            
+        unsigned long Time;   
         float velocity;
 };
 
