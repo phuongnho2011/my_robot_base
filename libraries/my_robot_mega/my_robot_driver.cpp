@@ -20,8 +20,8 @@ void motor_driver::init()
     pinMode(INT1_L, OUTPUT); //chan DIR1
     pinMode(INT2_L, OUTPUT); //chan DIR2
 
-    // attachInterrupt(digitalPinToInterrupt(A1),cal_encoderL,CHANGE);
-    // attachInterrupt(digitalPinToInterrupt(A2),cal_encoderL,CHANGE);
+    attachInterrupt(digitalPinToInterrupt(A1),cal_encoderL,CHANGE);
+    attachInterrupt(digitalPinToInterrupt(A2),cal_encoderL,CHANGE);
 }
 
 void motor_driver::motor_Right(int Pulse_Width)
