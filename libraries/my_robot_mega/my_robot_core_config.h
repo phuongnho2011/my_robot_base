@@ -89,7 +89,7 @@ void initJointStates(void);
 bool calcOdometry(double diff_time);
 
 // void sendLogMsg(void);
-// void waitForSerialLink(bool isConnected);
+void waitForSerialLink(bool isConnected);
 
 ros::NodeHandle nh;
 ros::Time current_time;

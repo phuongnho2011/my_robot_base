@@ -3,10 +3,9 @@
 #include <my_robot_core_config.h>
 
 void setup() {
-  
   // Initialize ROS node handle, advertise and subscribe the topics 
   nh.initNode();
-  nh.getHardware()->setBaud(115200);
+  //nh.getHardware()->setBaud(115200);
 
   nh.subscribe(cmd_vel_sub);
 
@@ -37,6 +36,7 @@ void loop() {
   updateTFPrefix(nh.connected());
   // Call all the callbacks waiting to be called at that point in time
 
+  // resize frequency of the motor
   if((t - tTime[0]) >= (1000/CONTROL_MOTOR_SPEED_FREQUENCY))
   {
     updateGoalVelocity();
@@ -60,6 +60,9 @@ void loop() {
   }
    
   nh.spinOnce();
+
+  // Wait the serial link time to process
+  //waitForSerialLink(nh.connected());
 }
 
 void initJointStates(void)
@@ -88,7 +91,6 @@ void updateOdometry(void)
 
   odom.pose.pose.position.x = odom_pose[0];
   odom.pose.pose.position.y = odom_pose[1];
-
   odom.pose.pose.position.z = 0;
   odom.pose.pose.orientation = tf::createQuaternionFromYaw(odom_pose[2]);
 
@@ -96,14 +98,14 @@ void updateOdometry(void)
   odom.twist.twist.angular.z = odom_vel[2];
 }
 
-void updateJointState(void)
-{
-
-}
-
 void updateTF(geometry_msgs::TransformStamped& odom_tf)
 {
-
+  odom_tf.header = odom.header;
+  odom_tf.child_frame_id = odom.child_frame_id;
+  odom_tf.transform.translation.x = odom.pose.pose.position.x;
+  odom_tf.transform.translation.y = odom.pose.pose.position.y;
+  odom_tf.transform.translation.z = odom.pose.pose.position.z;
+  odom_tf.transform.rotation      = odom.pose.pose.orientation;
 }
 
 void publishDriveInformation(void)
@@ -359,4 +361,26 @@ void motor_driver::cal_encoderL()
 void motor_driver::cal_encoderR()
 {
   mt_driver.read_EncoderR();
+}
+
+/*******************************************************************************
+* Wait for Serial Link
+*******************************************************************************/
+void waitForSerialLink(bool isConnected)
+{
+  static bool wait_flag = false;
+  
+  if (isConnected)
+  {
+    if (wait_flag == false)
+    {      
+      delay(10);
+
+      wait_flag = true;
+    }
+  }
+  else
+  {
+    wait_flag = false;
+  }
 }
