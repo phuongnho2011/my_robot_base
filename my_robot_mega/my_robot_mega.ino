@@ -239,6 +239,7 @@ void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
 
   goal_velocity_from_cmd[LINEAR]  = constrain(goal_velocity_from_cmd[LINEAR],  MIN_LINEAR_VELOCITY, MAX_LINEAR_VELOCITY);
   goal_velocity_from_cmd[ANGULAR] = constrain(goal_velocity_from_cmd[ANGULAR], MIN_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
+  tTime[6] = millis();
 }
 
 void updateGoalVelocity(void)

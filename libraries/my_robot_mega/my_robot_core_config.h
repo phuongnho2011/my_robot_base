@@ -44,8 +44,8 @@
 
 #define PULSE2RAD                         0.005099988  // 1[pulse] * 3.14159265359 / 1232 = 0.001533981f
 
-#define MIN_LINEAR_VELOCITY -2 
-#define MAX_LINEAR_VELOCITY  2
+#define MIN_LINEAR_VELOCITY -5
+#define MAX_LINEAR_VELOCITY  5
 
 #define MIN_ANGULAR_VELOCITY -1
 #define MAX_ANGULAR_VELOCITY 1

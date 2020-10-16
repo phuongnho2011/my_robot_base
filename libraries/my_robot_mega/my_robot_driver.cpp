@@ -21,7 +21,7 @@ void motor_driver::init()
     pinMode(INT2_L, OUTPUT); //chan DIR2
 
     attachInterrupt(digitalPinToInterrupt(A1),cal_encoderL,CHANGE);
-    attachInterrupt(digitalPinToInterrupt(A2),cal_encoderL,CHANGE);
+    attachInterrupt(digitalPinToInterrupt(A2),cal_encoderR,CHANGE);
 }
 
 void motor_driver::motor_Right(int Pulse_Width)
@@ -80,24 +80,24 @@ void motor_driver::read_EncoderL()
         if ( digitalRead(A1) == 0 ) 
         {
             // A fell, B is low
-            pulsesL--; // Moving forward
+            pulsesL++; // Moving forward
         } 
         else 
         {
             // A rose, B is high
-            pulsesL++; // Moving reverse
+            pulsesL--; // Moving reverse
         }
     } 
     else 
     {
         if ( digitalRead(A1) == 0 ) 
         {
-            pulsesL++; // Moving reverse
+            pulsesL--; // Moving reverse
         } 
         else 
         {
             // A rose, B is low
-            pulsesL--; // Moving forward
+            pulsesL++; // Moving forward
         }
     }
 }
@@ -109,24 +109,24 @@ void motor_driver::read_EncoderR()
         if ( digitalRead(A1) == 0 ) 
         {
             // A fell, B is low
-            pulsesL--; // Moving forward
+            pulsesL++; // Moving forward
         } 
         else
         {
             // A rose, B is high
-            pulsesL++; // Moving reverse
+            pulsesL--; // Moving reverse
         }
     } 
     else 
     {
         if ( digitalRead(A1) == 0 ) 
         {
-            pulsesL++; // Moving reverse
+            pulsesL--; // Moving reverse
         } 
         else 
         {
             // A rose, B is low
-            pulsesL--; // Moving forward
+            pulsesL++; // Moving forward
         }
     }
 }
@@ -141,7 +141,7 @@ int32_t motor_driver::getRightencoder()
     return pulsesR;
 }
 
-void motor_driver::control_Motor(const float wheel_rad, const float wheel_sep,float* cmd_value)
+void motor_driver::control_Motor(const float wheel_rad, const float wheel_sep, float* cmd_value)
 {
     motor_Left((cmd_value[LIN] / wheel_rad) + ((cmd_value[RAD] * wheel_sep) / (2.0 * wheel_rad))*10);
     motor_Right((cmd_value[LIN] / wheel_rad) - ((cmd_value[RAD] * wheel_sep) / (2.0 * wheel_rad))*10);
