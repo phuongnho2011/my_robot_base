@@ -104,29 +104,29 @@ void motor_driver::read_EncoderL()
 
 void motor_driver::read_EncoderR()
 {
-    if ( digitalRead(B1) == 0 ) 
+    if ( digitalRead(B2) == 0 ) 
     {
-        if ( digitalRead(A1) == 0 ) 
+        if ( digitalRead(A2) == 0 ) 
         {
             // A fell, B is low
-            pulsesL++; // Moving forward
+            pulsesL--; // Moving forward
         } 
         else
         {
             // A rose, B is high
-            pulsesL--; // Moving reverse
+            pulsesL++; // Moving reverse
         }
     } 
     else 
     {
-        if ( digitalRead(A1) == 0 ) 
+        if ( digitalRead(A2) == 0 ) 
         {
-            pulsesL--; // Moving reverse
+            pulsesL++; // Moving reverse
         } 
         else 
         {
             // A rose, B is low
-            pulsesL++; // Moving forward
+            pulsesL--; // Moving forward
         }
     }
 }
