@@ -2,7 +2,7 @@
 #define my_imu2_h
 
 #include <Arduino.h>
-#include <SoftwareWire.h>
+#include <Wire.h>
 
 class my_imu
 {
