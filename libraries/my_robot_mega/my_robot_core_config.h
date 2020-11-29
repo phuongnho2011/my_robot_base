@@ -16,7 +16,6 @@
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
-#include <my_imu.h>
 
 /* Time update index */
 #define CONTROL_MOTOR_TIME_INDEX                0       /*!< Time index control motor */
@@ -43,6 +42,23 @@
 #define LINEAR          0                       /*!< Linear velocity index */
 #define ANGULAR         1                       /*!< Angular velocity index */
 
+#define PULSE2RAD                         0.005099988  // 1[pulse] * 3.14159265359 / 1232 = 0.001533981f
+
+//#define MIN_LINEAR_VELOCITY  -7.01
+//#define MAX_LINEAR_VELOCITY  7.01
+
+#define MIN_LINEAR_VELOCITY  -0.22
+#define MAX_LINEAR_VELOCITY  0.22
+
+//#define MIN_ANGULAR_VELOCITY -0.3
+//#define MAX_ANGULAR_VELOCITY 0.3
+
+#define MIN_ANGULAR_VELOCITY -2.75
+#define MAX_ANGULAR_VELOCITY 2.75
+
+#define WHEEL_RADIUS 0.0275 //meter
+#define WHEEL_SEPRATION 0.318 //meter
+
 /*******************************************************************************
 * ROS Parameter
 *******************************************************************************/
@@ -54,21 +70,23 @@ char odom_child_frame_id[30];
 char imu_frame_id[30];
 char joint_state_header_frame_id[30];
 
-// void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg);
+void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg);
+ros::Subscriber<geometry_msgs::Twist> cmd_vel_sub("cmd_vel", commandVelocityCallback);
+
 // void resetCallback(const std_msgs::Empty& reset_msg);
 // void publishCmdVelFromAMEGA(void);
 
 ros::Time rosNow(void);
 
 void updateVariable(bool isConnected);
-// void updateMotorInfo(int32_t left_tick, int32_t right_tick);
+void updateMotorInfo(int32_t left_pulse, int32_t right_pulse);
 void updateTime(void);
 void updateOdometry(void);
 void updateJointStates(void);
 void updateTF(geometry_msgs::TransformStamped& odom_tf);
 void publishDriveInformation(void);
 // void updateGyroCali(bool isConnected);
-// void updateGoalVelocity(void);
+void updateGoalVelocity(void);
 // void updateTFPrefix(bool isConnected);
 
 void initOdom(void);
@@ -77,13 +95,13 @@ void initJointStates(void);
 bool calcOdometry(double diff_time);
 
 // void sendLogMsg(void);
-// void waitForSerialLink(bool isConnected);
+void waitForSerialLink(bool isConnected);
 
 ros::NodeHandle nh;
 ros::Time current_time;
 uint32_t current_offset;
 
-// ros::Subscriber<geometry_msgs::Twist> cmd_vel_sub("cmd_vel", commandVelocityCallback);
+
 
 // // Command velocity of Turtlebot3 using RC100 remote controller
 // geometry_msgs::Twist cmd_vel_amega_msg;
@@ -109,17 +127,17 @@ tf::TransformBroadcaster tf_broadcaster;
 // *******************************************************************************/
 static uint32_t tTime[10];
 
-// /*******************************************************************************
-// * Calculation for odometry
-// *******************************************************************************/
-// bool init_encoder = true;
-// int32_t last_diff_tick[WHEEL_NUM] = {0, 0};
-// double  last_rad[WHEEL_NUM]       = {0.0, 0.0};
+/*******************************************************************************
+* Calculation for odometry
+*******************************************************************************/
+bool init_encoder = true;
+int32_t last_diff_pulse[WHEEL_NUM] = {0, 0};
+double  last_rad[WHEEL_NUM]       = {0.0, 0.0};
 
-// /*******************************************************************************
-// * Update Joint State
-// *******************************************************************************/
-// double  last_velocity[WHEEL_NUM]  = {0.0, 0.0};
+/*******************************************************************************
+* Update Joint State
+*******************************************************************************/
+double  last_velocity[WHEEL_NUM]  = {0.0, 0.0};
 
 /*******************************************************************************
 * Declaration for SLAM and navigation
@@ -130,19 +148,17 @@ double odom_vel[3];
 
 
 
-// /*******************************************************************************
-// * Declaration for controllers
-// *******************************************************************************/
-// float zero_velocity[WHEEL_NUM] = {0.0, 0.0};
-// float goal_velocity[WHEEL_NUM] = {0.0, 0.0};
-// float goal_velocity_from_button[WHEEL_NUM] = {0.0, 0.0};
-// float goal_velocity_from_cmd[WHEEL_NUM] = {0.0, 0.0};
-// float goal_velocity_from_rc100[WHEEL_NUM] = {0.0, 0.0};
+/*******************************************************************************
+* Declaration for controllers
+*******************************************************************************/
+float zero_velocity[WHEEL_NUM] = {0.0, 0.0};
+float goal_velocity[WHEEL_NUM] = {0.0, 0.0};
+float goal_velocity_from_button[WHEEL_NUM] = {0.0, 0.0};
+float goal_velocity_from_cmd[WHEEL_NUM] = {0.0, 0.0};
+float goal_velocity_from_rc100[WHEEL_NUM] = {0.0, 0.0};
 
-// #define MIN_LINEAR_VELOCITY -2 
-// #define MAX_LINEAR_VELOCITY  2
+my_imu imu(0x68);
 
-// #define MIN_ANGULAR_VELOCITY -1
-// #define MAX_ANGULAR_VELOCITY 1
+motor_driver mt_driver;
 
 #endif
