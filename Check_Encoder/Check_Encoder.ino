@@ -1,4 +1,5 @@
-#include <my_robot_core_config.h>
+#include <my_imu2.h>
+#include <my_motor_driver.h>
 
 #define EN_L 4
 #define EN_R 5
@@ -32,7 +33,6 @@ float velocity;
 double w_r = 0, w_l = 0;
 //wheel_rad is the wheel radius ,wheel_sep is
 double wheel_rad = 0.0275, wheel_sep = 0.360;
-ros::NodeHandle nh;
 int lowSpeed = 200;
 int highSpeed = 50; 
 double speed_ang = 0, speed_lin = 0;
@@ -48,18 +48,10 @@ void Count_Left();
 void Count_Right();
 void Calculate_Velocity();
 
-void messageCb( const geometry_msgs::Twist& msg) {
-  speed_ang = msg.angular.z;
-  speed_lin = msg.linear.x;
-  w_r = (speed_lin / wheel_rad) + ((speed_ang * wheel_sep) / (2.0 * wheel_rad));
-  w_l = (speed_lin / wheel_rad) - ((speed_ang * wheel_sep) / (2.0 * wheel_rad));
-}
-
-ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", &messageCb );
 
 void setup() {
   Motor_init();
-  attachInterrupt(digitalPinToInterrupt(A1),Count_Left,FALLING);
+  attachInterrupt(digitalPinToInterrupt(A2),Count_Left,FALLING);
   Serial.begin(9600);
 }
 
