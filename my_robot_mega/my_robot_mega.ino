@@ -16,6 +16,7 @@ void setup() {
 
   // setting for imu
   imu.init();
+  imu.calculate_IMU_error();
 
   // setting for motors
   mt_driver.init();
@@ -34,6 +35,7 @@ void loop() {
   updateTime();
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
+  imu.calculateIMU();
   // Call all the callbacks waiting to be called at that point in time
 
   // resize frequency of the motor
