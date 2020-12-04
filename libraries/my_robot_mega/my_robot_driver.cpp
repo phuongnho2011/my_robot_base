@@ -2,7 +2,7 @@
 
 motor_driver::motor_driver()
 {
-
+    
 }
 
 void motor_driver::init()
@@ -19,6 +19,19 @@ void motor_driver::init()
     pinMode(EN_L, OUTPUT);   //chan pwm
     pinMode(INT1_L, OUTPUT); //chan DIR1
     pinMode(INT2_L, OUTPUT); //chan DIR2
+
+    PID PID_TEMP(&input, &output, &setpoint, kp_l, ki_l, kd_l, DIRECT);
+    myPID_left = PID_TEMP;
+    PID_TEMP.SetTunings(kp_r,ki_r,kd_r);
+    myPID_right = PID_TEMP;
+    
+    TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
+    myPID_left.SetMode(AUTOMATIC);
+    myPID_left.SetSampleTime(1);
+    myPID_left.SetOutputLimits(-255, 255);
+    myPID_right.SetMode(AUTOMATIC);
+    myPID_right.SetSampleTime(1);
+    myPID_right.SetOutputLimits(-255, 255);
 
     attachInterrupt(digitalPinToInterrupt(A1),cal_encoderL,CHANGE);
     attachInterrupt(digitalPinToInterrupt(A2),cal_encoderR,CHANGE);
@@ -66,11 +79,6 @@ void motor_driver::motor_Left(int Pulse_Width)
         digitalWrite(INT1_L, LOW);
         digitalWrite(INT2_L, LOW);
     }
-}
-
-void motor_driver::cal_Velocity()
-{
-    
 }
 
 void motor_driver::read_EncoderL()
@@ -143,6 +151,14 @@ int32_t motor_driver::getRightencoder()
 
 void motor_driver::control_Motor(const float wheel_rad, const float wheel_sep, float* cmd_value)
 {
-    motor_Left((cmd_value[LIN]*0.701/0.22 / wheel_rad)*10 - ((cmd_value[RAD]*4.41/2.75 * wheel_sep) / (2.0 * wheel_rad))*10);
-    motor_Right((cmd_value[LIN]*0.701/0.22 / wheel_rad)*10 + ((cmd_value[RAD]*4.41/2.75 * wheel_sep) / (2.0 * wheel_rad))*10);
+    setpoint = (cmd_value[LIN] - cmd_value[RAD]*wheel_sep/2)/(2*3.14159265359*wheel_rad)*1232;
+    input = getLeftencoder();
+    myPID_left.Compute();
+    motor_Left(output);
+    setpoint = (cmd_value[LIN] + cmd_value[RAD]*wheel_sep/2)/(2*3.14159265359*wheel_rad)*1232;
+    input = getRightencoder();
+    myPID_right.Compute();
+    motor_Right(output);
+    //motor_Left((cmd_value[LIN]*0.701/0.22 / wheel_rad)*10 - ((cmd_value[RAD]*4.41/2.75 * wheel_sep) / (2.0 * wheel_rad))*10);
+    //motor_Right((cmd_value[LIN]*0.701/0.22 / wheel_rad)*10 + ((cmd_value[RAD]*4.41/2.75 * wheel_sep) / (2.0 * wheel_rad))*10);
 }

@@ -42,7 +42,7 @@
 #define LINEAR          0                       /*!< Linear velocity index */
 #define ANGULAR         1                       /*!< Angular velocity index */
 
-#define PULSE2RAD                         0.005099988  // 1[pulse] * 3.14159265359 / 1232 = 0.001533981f
+#define PULSE2RAD                         0.005099988  // 1[pulse] * 2 * 3.14159265359 / 1232 = 0.001533981f
 
 //#define MIN_LINEAR_VELOCITY  -7.01
 //#define MAX_LINEAR_VELOCITY  7.01

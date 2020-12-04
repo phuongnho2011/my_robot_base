@@ -2,6 +2,7 @@
 #define my_motor_driver_h
 
 #include <Arduino.h>
+#include <PID_v1.h>
 
 #define EN_L 4
 #define EN_R 5
@@ -24,6 +25,14 @@
 #define LIN 0
 #define RAD 1
 
+//Constants used in some of the functions below
+#define AUTOMATIC	1
+#define MANUAL	0
+#define DIRECT  0
+#define REVERSE  1
+#define P_ON_M 0
+#define P_ON_E 1
+
 class motor_driver
 {
     public:
@@ -31,7 +40,6 @@ class motor_driver
         void init(void);
         void motor_Right(int);
         void motor_Left(int);
-        void cal_Velocity(void);
         void control_Motor(const float wheel_rad, const float wheel_sep,float* cmd_value);
         void read_EncoderL();
         static void cal_encoderL();
@@ -40,12 +48,12 @@ class motor_driver
         int32_t getLeftencoder();
         int32_t getRightencoder();
     private:
-        unsigned int lastTime;
-        float rpm;
+        double kp_l, ki_l, kd_l, input, output, setpoint; 
+        double kp_r, ki_r, kd_r;
+        PID myPID_left;
+        PID myPID_right;
         int32_t pulsesL, pulsesR;
-        unsigned long previousTime = 0;
-        unsigned long Time;   
-        float velocity;
+
 };
 
 #endif 
