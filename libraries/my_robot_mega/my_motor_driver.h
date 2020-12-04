@@ -47,6 +47,7 @@ class motor_driver
         static void cal_encoderR();
         int32_t getLeftencoder();
         int32_t getRightencoder();
+        double getOutput();
     private:
         double kp_l, ki_l, kd_l, input, output, setpoint; 
         double kp_r, ki_r, kd_r;

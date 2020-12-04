@@ -46,6 +46,8 @@ void loop() {
     }
     else
     {
+      sprintf(log_msg, "Output: [%f]", mt_driver.getOutput());
+      nh.loginfo(log_msg); 
       mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,goal_velocity);
     }
     tTime[0] = t;
