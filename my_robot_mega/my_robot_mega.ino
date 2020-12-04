@@ -34,6 +34,7 @@ void loop() {
   updateTime();
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
+  char log_msg2[50];
   // Call all the callbacks waiting to be called at that point in time
 
   // resize frequency of the motor
@@ -46,8 +47,8 @@ void loop() {
     }
     else
     {
-      sprintf(log_msg, "Output: [%f]", mt_driver.getOutput());
-      nh.loginfo(log_msg); 
+      sprintf(log_msg2, "Output: [%f]", mt_driver.getOutput());
+      nh.loginfo(log_msg2); 
       mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,goal_velocity);
     }
     tTime[0] = t;
