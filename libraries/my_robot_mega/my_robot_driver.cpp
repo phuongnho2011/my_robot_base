@@ -163,7 +163,7 @@ void motor_driver::control_Motor(const float wheel_rad, const float wheel_sep, f
     //motor_Right((cmd_value[LIN]*0.701/0.22 / wheel_rad)*10 + ((cmd_value[RAD]*4.41/2.75 * wheel_sep) / (2.0 * wheel_rad))*10);
 }
 
-double getOutput()
+double motor_driver::getOutput()
 {
     return output;
 }
