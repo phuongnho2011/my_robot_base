@@ -49,7 +49,7 @@ void loop() {
     else
     {
       dtostrf(mt_driver.getOutput(),4,6,TempString);
-      sprintf(log_msg2, "Output: [%f]", String(TempString));
+      sprintf(log_msg2, "Output: [%s]", String(TempString));
       nh.loginfo(log_msg2); 
       mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,goal_velocity);
     }
