@@ -152,26 +152,31 @@ void updateTFPrefix(bool isConnected)
   {
     if (isChecked == false)
     {
-      nh.getParam("~tf_prefix", &get_tf_prefix);
+      // nh.getParam("~tf_prefix", &get_tf_prefix);
 
-      if (!strcmp(get_tf_prefix, ""))
-      {
-        sprintf(odom_header_frame_id, "odom");
-        sprintf(odom_child_frame_id, "base_footprint");  
-        sprintf(joint_state_header_frame_id, "base_link");
-      }
-      else
-      {
-        strcpy(odom_header_frame_id, get_tf_prefix);
-        strcpy(odom_child_frame_id, get_tf_prefix);
+      sprintf(odom_header_frame_id, "odom");
+      sprintf(odom_child_frame_id, "base_footprint");  
+      sprintf(joint_state_header_frame_id, "base_link");
+      strcat(odom_header_frame_id, "/odom");
+      strcat(odom_child_frame_id, "/base_footprint");
+      strcat(joint_state_header_frame_id, "/base_link");
 
-        strcpy(joint_state_header_frame_id, get_tf_prefix);
+      // if (!strcmp(get_tf_prefix, ""))
+      // {
+      //   sprintf(odom_header_frame_id, "odom");
+      //   sprintf(odom_child_frame_id, "base_footprint");  
+      //   sprintf(joint_state_header_frame_id, "base_link");
+      // }
+      // else
+      // {
+      //   strcpy(odom_header_frame_id, get_tf_prefix);
+      //   strcpy(odom_child_frame_id, get_tf_prefix);
+      //   strcpy(joint_state_header_frame_id, get_tf_prefix);
+      //   strcat(odom_header_frame_id, "/odom");
+      //   strcat(odom_child_frame_id, "/base_footprint");
 
-        strcat(odom_header_frame_id, "/odom");
-        strcat(odom_child_frame_id, "/base_footprint");
-
-        strcat(joint_state_header_frame_id, "/base_link");
-      }
+      //   strcat(joint_state_header_frame_id, "/base_link");
+      // }
 
       sprintf(log_msg, "Setup TF on Odometry [%s]", odom_header_frame_id);
       nh.loginfo(log_msg); 
