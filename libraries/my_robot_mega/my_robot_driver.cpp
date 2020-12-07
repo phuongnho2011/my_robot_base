@@ -19,7 +19,12 @@ void motor_driver::init()
     pinMode(EN_L, OUTPUT);   //chan pwm
     pinMode(INT1_L, OUTPUT); //chan DIR1
     pinMode(INT2_L, OUTPUT); //chan DIR2
-
+    kp_l = 5;
+    ki_l = 1;
+    kd_l = 0.01;
+    kp_r = 5;
+    ki_r = 1;
+    kd_r = 0.01;
     PID PID_TEMP(&input, &output, &setpoint, kp_l, ki_l, kd_l, DIRECT);
     myPID_left = PID_TEMP;
     PID_TEMP.SetTunings(kp_r,ki_r,kd_r);
