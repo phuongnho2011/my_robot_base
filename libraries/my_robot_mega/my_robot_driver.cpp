@@ -32,10 +32,10 @@ void motor_driver::init()
     
     TCCR1B = TCCR1B & 0b11111000 | 1;                   // set 31KHz PWM to prevent motor noise
     myPID_left.SetMode(AUTOMATIC);
-    myPID_left.SetSampleTime(1);
+    myPID_left.SetSampleTime(10);
     myPID_left.SetOutputLimits(-255, 255);
     myPID_right.SetMode(AUTOMATIC);
-    myPID_right.SetSampleTime(1);
+    myPID_right.SetSampleTime(10);
     myPID_right.SetOutputLimits(-255, 255);
 
     attachInterrupt(digitalPinToInterrupt(A1),cal_encoderL,CHANGE);
