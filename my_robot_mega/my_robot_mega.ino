@@ -157,9 +157,6 @@ void updateTFPrefix(bool isConnected)
       sprintf(odom_header_frame_id, "odom");
       sprintf(odom_child_frame_id, "base_footprint");  
       sprintf(joint_state_header_frame_id, "base_link");
-      strcat(odom_header_frame_id, "/odom");
-      strcat(odom_child_frame_id, "/base_footprint");
-      strcat(joint_state_header_frame_id, "/base_link");
 
       // if (!strcmp(get_tf_prefix, ""))
       // {
