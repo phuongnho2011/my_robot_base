@@ -269,8 +269,8 @@ bool calcOdometry(double diff_time)
   if (step_time == 0)
     return false;
 
-  wheel_l = PULSE2RAD*(double)last_diff_pulse[LEFT];
-  wheel_r = PULSE2RAD*(double)last_diff_pulse[RIGHT];
+  wheel_l = PULSE2RADL*(double)last_diff_pulse[LEFT];
+  wheel_r = PULSE2RADR*(double)last_diff_pulse[RIGHT];
   
   if(isnan(wheel_l))
     wheel_l = 0.0;
@@ -349,13 +349,13 @@ void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
 
   last_diff_pulse[LEFT] = current_pulse - last_pulse[LEFT];
   last_pulse[LEFT]      = current_pulse;
-  last_rad[LEFT]       += PULSE2RAD * (double)last_diff_pulse[LEFT];
+  last_rad[LEFT]       += PULSE2RADL * (double)last_diff_pulse[LEFT];
 
   current_pulse = right_pulse;
 
   last_diff_pulse[RIGHT] = current_pulse - last_pulse[RIGHT];
   last_pulse[RIGHT]      = current_pulse;
-  last_rad[RIGHT]       += PULSE2RAD * (double)last_diff_pulse[RIGHT];
+  last_rad[RIGHT]       += PULSE2RADR * (double)last_diff_pulse[RIGHT];
 }
 
 void motor_driver::cal_encoderL()

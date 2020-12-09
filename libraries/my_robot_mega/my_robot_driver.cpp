@@ -143,6 +143,8 @@ int32_t motor_driver::getRightencoder()
 
 void motor_driver::control_Motor(const float wheel_rad, const float wheel_sep, float* cmd_value)
 {
-    motor_Left((cmd_value[LIN]*0.701/0.22 / wheel_rad)*10 - ((cmd_value[RAD]*4.41/2.75 * wheel_sep) / (2.0 * wheel_rad))*10);
-    motor_Right((cmd_value[LIN]*0.701/0.22 / wheel_rad)*10 + ((cmd_value[RAD]*4.41/2.75 * wheel_sep) / (2.0 * wheel_rad))*10);
+    motor_Left((cmd_value[LIN] - cmd_value[RAD]*wheel_sep/2)/(2*3.14159265359*wheel_rad)/1.27*255);
+    motor_Right((cmd_value[LIN] + cmd_value[RAD]*wheel_sep/2)/(2*3.14159265359*wheel_rad)/1.27*255);    
+    //motor_Left((cmd_value[LIN]*0.701/0.22 / wheel_rad)*10 - ((cmd_value[RAD]*4.41/2.75 * wheel_sep) / (2.0 * wheel_rad))*10);
+    //motor_Right((cmd_value[LIN]*0.701/0.22 / wheel_rad)*10 + ((cmd_value[RAD]*4.41/2.75 * wheel_sep) / (2.0 * wheel_rad))*10);
 }
