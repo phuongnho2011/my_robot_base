@@ -53,7 +53,6 @@ void loop() {
   
   if ((t-tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
   {
-
     updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
     publishDriveInformation();
     tTime[2] = t;
@@ -62,7 +61,7 @@ void loop() {
   nh.spinOnce();
 
   // Wait the serial link time to process
-  //waitForSerialLink(nh.connected());
+  // waitForSerialLink(nh.connected());
 }
 
 void initJointStates(void)
@@ -347,11 +346,6 @@ void motor_driver::cal_encoderL()
 void motor_driver::cal_encoderR()
 {
   mt_driver.read_EncoderR();
-}
-
-void motor_driver::calling_PID()
-{
-  mt_driver.PID();
 }
 
 /*******************************************************************************
