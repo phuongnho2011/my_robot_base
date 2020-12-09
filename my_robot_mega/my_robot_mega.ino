@@ -34,8 +34,6 @@ void loop() {
   updateTime();
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
-  char log_msg2[50];
-  char TempString[50];
   // Call all the callbacks waiting to be called at that point in time
 
   // resize frequency of the motor
@@ -48,9 +46,6 @@ void loop() {
     }
     else
     {
-      dtostrf(mt_driver.getOutput(),4,6,TempString);
-      sprintf(log_msg2, "Output: [%s]", TempString);
-      nh.loginfo(log_msg2); 
       mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,goal_velocity);
     }
     tTime[0] = t;
@@ -152,28 +147,9 @@ void updateTFPrefix(bool isConnected)
   {
     if (isChecked == false)
     {
-      // nh.getParam("~tf_prefix", &get_tf_prefix);
-
       sprintf(odom_header_frame_id, "odom");
       sprintf(odom_child_frame_id, "base_footprint");  
       sprintf(joint_state_header_frame_id, "base_link");
-
-      // if (!strcmp(get_tf_prefix, ""))
-      // {
-      //   sprintf(odom_header_frame_id, "odom");
-      //   sprintf(odom_child_frame_id, "base_footprint");  
-      //   sprintf(joint_state_header_frame_id, "base_link");
-      // }
-      // else
-      // {
-      //   strcpy(odom_header_frame_id, get_tf_prefix);
-      //   strcpy(odom_child_frame_id, get_tf_prefix);
-      //   strcpy(joint_state_header_frame_id, get_tf_prefix);
-      //   strcat(odom_header_frame_id, "/odom");
-      //   strcat(odom_child_frame_id, "/base_footprint");
-
-      //   strcat(joint_state_header_frame_id, "/base_link");
-      // }
 
       sprintf(log_msg, "Setup TF on Odometry [%s]", odom_header_frame_id);
       nh.loginfo(log_msg); 
@@ -274,8 +250,8 @@ bool calcOdometry(double diff_time)
   if (step_time == 0)
     return false;
 
-  wheel_l = PULSE2RAD*(double)last_diff_pulse[LEFT];
-  wheel_r = PULSE2RAD*(double)last_diff_pulse[RIGHT];
+  wheel_l = PULSE2RADL*(double)last_diff_pulse[LEFT];
+  wheel_r = PULSE2RADR*(double)last_diff_pulse[RIGHT];
   
   if(isnan(wheel_l))
     wheel_l = 0.0;
@@ -354,13 +330,13 @@ void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
 
   last_diff_pulse[LEFT] = current_pulse - last_pulse[LEFT];
   last_pulse[LEFT]      = current_pulse;
-  last_rad[LEFT]       += PULSE2RAD * (double)last_diff_pulse[LEFT];
+  last_rad[LEFT]       += PULSE2RADL * (double)last_diff_pulse[LEFT];
 
   current_pulse = right_pulse;
 
   last_diff_pulse[RIGHT] = current_pulse - last_pulse[RIGHT];
   last_pulse[RIGHT]      = current_pulse;
-  last_rad[RIGHT]       += PULSE2RAD * (double)last_diff_pulse[RIGHT];
+  last_rad[RIGHT]       += PULSE2RADR * (double)last_diff_pulse[RIGHT];
 }
 
 void motor_driver::cal_encoderL()
@@ -371,6 +347,11 @@ void motor_driver::cal_encoderL()
 void motor_driver::cal_encoderR()
 {
   mt_driver.read_EncoderR();
+}
+
+void motor_driver::calling_PID()
+{
+  mt_driver.PID();
 }
 
 /*******************************************************************************

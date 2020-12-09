@@ -2,7 +2,7 @@
 #define my_motor_driver_h
 
 #include <Arduino.h>
-#include <PID_v1.h>
+#include<TimerOne.h>
 
 #define EN_L 4
 #define EN_R 5
@@ -39,13 +39,23 @@ class motor_driver
         static void cal_encoderR();
         int32_t getLeftencoder();
         int32_t getRightencoder();
-        double getOutput();
+        void PID();
+        static void calling_PID();
     private:
-        double kp_l, ki_l, kd_l, input, output, setpoint; 
-        double kp_r, ki_r, kd_r;
-        PID myPID_left;
-        PID myPID_right;
         int32_t pulsesL, pulsesR;
+        //PID
+        double T, LPF_heso=0.08 ;
+        double pulseR_PID;
+        double speedR,setpointR, pre_speedR;
+        double E1_R,E1_1_R,E1_2_R;
+        double alphaR,betaR,gamaR,KpR,KiR,KdR;
+        double OutputR, LastOutputR;
+
+        double pulseL_PID;
+        double speedL, setpointL, pre_speedL;
+        double E1_L, E1_1_L, E1_2_L;
+        double alphaL, betaL, gamaL, KpL ,KiL ,KdL;
+        double OutputL, LastOutputL;
 
 };
 

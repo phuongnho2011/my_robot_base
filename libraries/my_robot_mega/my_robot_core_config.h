@@ -28,7 +28,6 @@
 /* Frequency of publish/subscribe */
 #define CONTROL_MOTOR_SPEED_FREQUENCY          10       /*!< Frequency in Hz to control motor */
 #define CONTROL_MOTOR_TIMEOUT                  500      /*!< Period in ms to check control motor timeout */
-#define IMU_PUBLISH_FREQUENCY                  15      	/*!< Frequency in Hz to publish IMU information */
 #define CMD_VEL_PUBLISH_FREQUENCY              5       	/*!< Frequency in Hz to publish robot velocity */
 #define DRIVE_INFORMATION_PUBLISH_FREQUENCY    5       	/*!< Frequency in Hz to publish drive information */
 #define DEBUG_LOG_FREQUENCY                    10       /*!< Frequency in Hz to send log debug messages */
@@ -42,7 +41,8 @@
 #define LINEAR          0                       /*!< Linear velocity index */
 #define ANGULAR         1                       /*!< Angular velocity index */
 
-#define PULSE2RAD                         0.005099988  // 1[pulse] * 2 * 3.14159265359 / 1232 = 0.001533981f
+#define PULSE2RADR                         0.010199976  // 1[pulse] * 2 * 3.14159265359 / 616 = 0.010199976f
+#define PULSE2RADL                         0.012319971 
 
 //#define MIN_LINEAR_VELOCITY  -7.01
 //#define MAX_LINEAR_VELOCITY  7.01
@@ -56,8 +56,8 @@
 #define MIN_ANGULAR_VELOCITY -2.75
 #define MAX_ANGULAR_VELOCITY 2.75
 
-#define WHEEL_RADIUS 0.0275 //meter
-#define WHEEL_SEPRATION 0.318 //meter
+#define WHEEL_RADIUS 0.033 //meter
+#define WHEEL_SEPRATION 0.287 //meter
 
 /*******************************************************************************
 * ROS Parameter
