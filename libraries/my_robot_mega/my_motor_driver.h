@@ -32,7 +32,7 @@ class motor_driver
         void init(void);
         void motor_Right(int);
         void motor_Left(int);
-        void control_Motor(const float wheel_rad, const float wheel_sep,float* cmd_value);
+        void control_Motor(const float wheel_rad, const float wheel_sep,float* cmd_value, double time);
         void read_EncoderL();
         static void cal_encoderL();
         void read_EncoderR();
@@ -41,6 +41,7 @@ class motor_driver
         int32_t getRightencoder();
         void PID(double);
 	double getOutputL();
+	double getSpeedL();
     private:
         int32_t pulsesL, pulsesR;
         //PID

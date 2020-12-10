@@ -26,7 +26,7 @@
 #define CONTROL_MOTOR_TIMEOUT_TIME_INDEX        6       /*!< Time index control motor timeout */
 
 /* Frequency of publish/subscribe */
-#define CONTROL_MOTOR_SPEED_FREQUENCY          10       /*!< Frequency in Hz to control motor */
+#define CONTROL_MOTOR_SPEED_FREQUENCY          10      /*!< Frequency in Hz to control motor */
 #define CONTROL_MOTOR_TIMEOUT                  500      /*!< Period in ms to check control motor timeout */
 #define CMD_VEL_PUBLISH_FREQUENCY              5       	/*!< Frequency in Hz to publish robot velocity */
 #define DRIVE_INFORMATION_PUBLISH_FREQUENCY    5       	/*!< Frequency in Hz to publish drive information */
@@ -125,7 +125,7 @@ tf::TransformBroadcaster tf_broadcaster;
 // /*******************************************************************************
 // * SoftwareTimer of Turtlebot3
 // *******************************************************************************/
-static uint32_t tTime[10];
+static double tTime[10];
 
 /*******************************************************************************
 * Calculation for odometry

@@ -1,6 +1,7 @@
 #include <my_motor_driver.h>
 
 motor_driver motor;
+float value[2] = {0.5,1};
 
 void setup()
 {
@@ -14,7 +15,8 @@ void loop()
 {
   
   if(millis() - t > 10){
-  motor.PID(millis() - t);
+  //motor.PID(millis() - t);
+  motor.control_Motor(0.033,0.287,value,millis() - t);
   //Serial.println(motor.getRightencoder());
   Serial.println(motor.getOutputL());
   t = millis();

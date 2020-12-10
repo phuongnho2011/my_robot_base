@@ -2,16 +2,15 @@
 #include <my_motor_driver.h>
 #include <my_robot_core_config.h>
 
+float value[2] = {0.5,1};
+
 void setup() {
   // Initialize ROS node handle, advertise and subscribe the topics 
   nh.getHardware()->setBaud(115200);
   nh.initNode();
-
   nh.subscribe(cmd_vel_sub);
-
   nh.advertise(odom_pub);
   nh.advertise(joint_states_pub);
-
   tf_broadcaster.init(nh);
 
   // setting for imu
@@ -30,23 +29,25 @@ void setup() {
 }
 
 void loop() {
-  uint32_t t = millis();
+  double t = millis();
+  
   updateTime();
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
   // Call all the callbacks waiting to be called at that point in time
 
   // resize frequency of the motor
+  
   if((t - tTime[0]) >= (1000/CONTROL_MOTOR_SPEED_FREQUENCY))
   {
     updateGoalVelocity();
     if((t - tTime[6]) > CONTROL_MOTOR_TIMEOUT)
     {
-      mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,zero_velocity);
+      mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,zero_velocity, 0);
     }
     else
     {
-      mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,goal_velocity);
+      //mt_driver.control_Motor(WHEEL_RADIUS, WHEEL_SEPRATION, goal_velocity, t-tTime[0]);
     }
     tTime[0] = t;
   }
@@ -202,9 +203,7 @@ void updateVariable(bool isConnected)
   {
     if (variable_flag == false)
     {      
-//      sensors.initIMU();
       initOdom();
-
       variable_flag = true;
     }
   }
@@ -221,6 +220,7 @@ void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
 
   goal_velocity_from_cmd[LINEAR]  = constrain(goal_velocity_from_cmd[LINEAR],  MIN_LINEAR_VELOCITY, MAX_LINEAR_VELOCITY);
   goal_velocity_from_cmd[ANGULAR] = constrain(goal_velocity_from_cmd[ANGULAR], MIN_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
+
   tTime[6] = millis();
 }
 

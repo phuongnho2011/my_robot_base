@@ -20,7 +20,7 @@ void motor_driver::init()
     pinMode(INT1_L, OUTPUT); //chan DIR1
     pinMode(INT2_L, OUTPUT); //chan DIR2
 
-    //T = 0.1;
+    T = 0;
     speedR = 0.00, pre_speedR = 0.00;
     E1_R = 0, E1_1_R = 0, E1_2_R = 0;
     OutputR = 0, LastOutputR = 0;
@@ -176,8 +176,9 @@ int32_t motor_driver::getRightencoder()
     return pulsesR;
 }
 
-void motor_driver::control_Motor(const float wheel_rad, const float wheel_sep, float* cmd_value)
+void motor_driver::control_Motor(const float wheel_rad, const float wheel_sep, float* cmd_value, double time)
 {
+    T = time/1000;
     setpointR = (cmd_value[LIN] - cmd_value[RAD]*wheel_sep/2)/(2*3.14159265359*wheel_rad)*60;
     setpointL = (cmd_value[LIN] + cmd_value[RAD]*wheel_sep/2)/(2*3.14159265359*wheel_rad)*60;
     
@@ -353,4 +354,9 @@ void motor_driver::PID(double time)
 double motor_driver::getOutputL()
 {
     return OutputL;
+}
+
+double motor_driver::getSpeedL()
+{
+    return speedL;
 }
