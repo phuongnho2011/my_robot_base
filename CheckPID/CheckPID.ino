@@ -13,9 +13,10 @@ long t = millis();
 void loop()
 {
   
-  if(millis() - t > 100){
-//  Serial.println(millis()-t);
-  motor.PID(millis() - t - 1);
+  if(millis() - t > 10){
+  motor.PID(millis() - t);
+  //Serial.println(motor.getRightencoder());
+  Serial.println(motor.getOutputL());
   t = millis();
   }
 }
