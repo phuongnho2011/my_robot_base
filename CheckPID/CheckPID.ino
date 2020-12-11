@@ -15,7 +15,7 @@ void loop()
 {
   if(millis() - t > 100){
   motor.PID(millis() - t);
-  Serial.println(motor.getSpeedL());
+  Serial.printl
   t = millis();
   }
 }
