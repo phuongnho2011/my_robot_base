@@ -13,7 +13,7 @@ long t = millis();
 
 void loop()
 {
-  Serial.println(motor.getLeftencoder());
+  Serial.println(motor.getRightencoder());
   //if(millis() - t > 100){
   //motor.PID(millis() - t);
   //motor.control_Motor(0.033,0.287,value,millis() - t);

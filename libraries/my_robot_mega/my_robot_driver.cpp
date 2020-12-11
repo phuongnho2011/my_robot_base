@@ -83,35 +83,100 @@ void motor_driver::motor_Left(int Pulse_Width)
     }
 }
 
-#if Encoder_x1
+
+// void motor_driver::read_EncoderL()
+// {
+//     if(digitalRead(B1)==HIGH)
+//     {
+//         pulsesL --;
+//         pulseL_PID --;
+//     }
+//     else
+//     {
+//         pulsesL ++;
+//         pulseL_PID ++;
+//     }
+// }
+
+// void motor_driver::read_EncoderR()
+// {
+//     if(digitalRead(B2)==HIGH)
+//     {
+//         pulsesR ++;
+//         pulseR_PID ++;
+//     }
+//     else
+//     {
+//         pulsesR --;
+//         pulseR_PID --;
+//     }
+// }
+
 void motor_driver::read_EncoderL()
 {
-    if(digitalRead(B1)==HIGH)
+    if ( digitalRead(B1) == 0 ) 
     {
-        pulsesL --;
-        pulseL_PID --;
-    }
-    else
+        if ( digitalRead(A1) == 0 ) 
+        {
+            // A fell, B is low
+            pulsesL++; // Moving forward
+	        pulseL_PID++;
+        } 
+        else 
+        {
+            // A rose, B is high
+            pulsesL--; // Moving reverse
+	        pulseL_PID--;
+        }
+    } 
+    else 
     {
-        pulsesL ++;
-        pulseL_PID ++;
+        if ( digitalRead(A1) == 0 ) 
+        {
+            pulsesL--; // Moving reverse
+            pulseL_PID--;
+        } 
+        else 
+        {
+            // A rose, B is low
+            pulsesL++; // Moving forward
+	        pulseL_PID++;
+        }
     }
 }
 
 void motor_driver::read_EncoderR()
 {
-    if(digitalRead(B2)==HIGH)
+    if ( digitalRead(B2) == 0 ) 
     {
-        pulsesR ++;
-        pulseR_PID ++;
-    }
-    else
+        if ( digitalRead(A2) == 0 ) 
+        {
+            // A fell, B is low
+            pulsesR--; // Moving forward
+	        pulseR_PID--;
+        } 
+        else
+        {
+            // A rose, B is high
+            pulsesR++; // Moving reverse
+	        pulseR_PID++;
+        }
+    } 
+    else 
     {
-        pulsesR --;
-        pulseR_PID --;
+        if ( digitalRead(A2) == 0 ) 
+        {
+            pulsesR++; // Moving reverse
+	        pulseR_PID++;
+        } 
+        else 
+        {
+            // A rose, B is low
+            pulsesR--; // Moving forward
+	        pulseR_PID--;
+        }
     }
 }
-#endif
 
 int32_t motor_driver::getLeftencoder()
 {

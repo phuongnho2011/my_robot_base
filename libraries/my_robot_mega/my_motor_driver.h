@@ -25,6 +25,7 @@
 #define LIN 0
 #define RAD 1
 
+
 class motor_driver
 {
     public:
