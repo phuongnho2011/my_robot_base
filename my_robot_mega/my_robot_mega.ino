@@ -43,11 +43,11 @@ void loop() {
     updateGoalVelocity();
     if((t - tTime[6]) > CONTROL_MOTOR_TIMEOUT)
     {
-      mt_driver.control_Motor(WHEEL_RADIUS,WHEEL_SEPRATION,zero_velocity, 0);
+      mt_driver.control_Motor(WHEEL_RADIUS, WHEEL_SEPRATION, zero_velocity, t - tTime[0]);
     }
     else
     {
-      //mt_driver.control_Motor(WHEEL_RADIUS, WHEEL_SEPRATION, goal_velocity, t-tTime[0]);
+      mt_driver.control_Motor(WHEEL_RADIUS, WHEEL_SEPRATION, goal_velocity, t - tTime[0]);
     }
     tTime[0] = t;
   }
@@ -62,7 +62,7 @@ void loop() {
   nh.spinOnce();
 
   // Wait the serial link time to process
-  // waitForSerialLink(nh.connected());
+  waitForSerialLink(nh.connected());
 }
 
 void initJointStates(void)

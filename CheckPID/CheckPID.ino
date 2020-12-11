@@ -13,14 +13,14 @@ long t = millis();
 
 void loop()
 {
-  
-  if(millis() - t > 10){
+  Serial.println(motor.getLeftencoder());
+  //if(millis() - t > 100){
   //motor.PID(millis() - t);
-  motor.control_Motor(0.033,0.287,value,millis() - t);
+  //motor.control_Motor(0.033,0.287,value,millis() - t);
   //Serial.println(motor.getRightencoder());
-  Serial.println(motor.getOutputL());
-  t = millis();
-  }
+  //Serial.println(motor.getSpeedL());
+  //t = millis();
+  //}
 }
 
 void motor_driver::cal_encoderL()

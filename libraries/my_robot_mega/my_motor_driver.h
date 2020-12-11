@@ -2,7 +2,7 @@
 #define my_motor_driver_h
 
 #include <Arduino.h>
-//#include<TimerOne.h>
+#include <ros.h>
 
 #define EN_L 4
 #define EN_R 5
@@ -32,7 +32,7 @@ class motor_driver
         void init(void);
         void motor_Right(int);
         void motor_Left(int);
-        void control_Motor(const float wheel_rad, const float wheel_sep,float* cmd_value, double time);
+        void control_Motor(const float wheel_rad, const float wheel_sep,float* cmd_value,double time);
         void read_EncoderL();
         static void cal_encoderL();
         void read_EncoderR();
@@ -41,6 +41,7 @@ class motor_driver
         int32_t getRightencoder();
         void PID(double);
 	double getOutputL();
+	double getOutputR();
 	double getSpeedL();
     private:
         int32_t pulsesL, pulsesR;
