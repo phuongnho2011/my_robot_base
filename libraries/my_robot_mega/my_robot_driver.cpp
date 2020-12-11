@@ -32,7 +32,7 @@ void motor_driver::init()
     E1_L = 0, E1_1_L = 0, E1_2_L = 0;
     OutputL = 0, LastOutputL = 0;
     // KpL = 1200, KdL = 18.0, KiL = 8.0;
-    KpL = 25, KdL = 0, KiL = 0;
+    KpL = 26, KdL = 15, KiL = 0.8;
 
     attachInterrupt(digitalPinToInterrupt(A1),cal_encoderL,CHANGE);
     attachInterrupt(digitalPinToInterrupt(A2),cal_encoderR,CHANGE);
@@ -301,6 +301,7 @@ void motor_driver::PID(double time)
     speedL = speedL * LPF_heso + pre_speedL * (1-LPF_heso);
     pre_speedL = speedL;
     pulseL_PID = 0;
+    Serial.println(speedL);
     E1_L = setpointL - speedL;
 
     alphaL=2*T*KpL + KiL*T*T+ 2*KdL;
