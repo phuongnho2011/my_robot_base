@@ -41,9 +41,11 @@ class motor_driver
         int32_t getLeftencoder();
         int32_t getRightencoder();
         void PID(double);
-	double getOutputL();
-	double getOutputR();
-	double getSpeedL();
+	    double getSpeedL();
+	    void setSetpointL(float);
+	    void setSetpointR(float);
+        void setpulseR_PID(float);
+        void setpulseL_PID(float);
     private:
         int32_t pulsesL, pulsesR;
         //PID

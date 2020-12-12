@@ -28,39 +28,36 @@ void setup() {
   
 }
 
+char test[50];
 void loop() {
-  double t = millis();
-  
   updateTime();
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
-  // Call all the callbacks waiting to be called at that point in time
-
-  // resize frequency of the motor
   
-  if((t - tTime[0]) >= (1000/CONTROL_MOTOR_SPEED_FREQUENCY))
+  if((millis() - tTime[0]) >= (1000/CONTROL_MOTOR_SPEED_FREQUENCY))
   {
-    updateGoalVelocity();
-    if((t - tTime[6]) > CONTROL_MOTOR_TIMEOUT)
+    if(millis() - tTime[6] >= CONTROL_MOTOR_TIMEOUT)
     {
-      mt_driver.control_Motor(WHEEL_RADIUS, WHEEL_SEPRATION, zero_velocity, t - tTime[0]);
+      mt_driver.setSetpointL(0);
+      mt_driver.setSetpointR(0);
+      tTime[6] = millis();
     }
     else
     {
-      mt_driver.control_Motor(WHEEL_RADIUS, WHEEL_SEPRATION, goal_velocity, t - tTime[0]);
+      mt_driver.PID(millis() - tTime[0]);
+      tTime[0] = millis();
     }
-    tTime[0] = t;
   }
   
-  if ((t-tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
+  if ((millis()-tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
   {
-    updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
-    publishDriveInformation();
-    tTime[2] = t;
+      updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
+      publishDriveInformation();
+      tTime[2] = millis();
   }
-   
-  nh.spinOnce();
 
+
+  nh.spinOnce();
   // Wait the serial link time to process
   waitForSerialLink(nh.connected());
 }
@@ -215,19 +212,9 @@ void updateVariable(bool isConnected)
 
 void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
 {
-  goal_velocity_from_cmd[LINEAR]  = cmd_vel_msg.linear.x;
-  goal_velocity_from_cmd[ANGULAR] = cmd_vel_msg.angular.z;
-
-  goal_velocity_from_cmd[LINEAR]  = constrain(goal_velocity_from_cmd[LINEAR],  MIN_LINEAR_VELOCITY, MAX_LINEAR_VELOCITY);
-  goal_velocity_from_cmd[ANGULAR] = constrain(goal_velocity_from_cmd[ANGULAR], MIN_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
-
+  mt_driver.setSetpointL((cmd_vel_msg.linear.x + cmd_vel_msg.angular.z*WHEEL_SEPRATION/2)/(2*3.14159265359*WHEEL_RADIUS)*60);
+  mt_driver.setSetpointR((cmd_vel_msg.linear.x - cmd_vel_msg.angular.z*WHEEL_SEPRATION/2)/(2*3.14159265359*WHEEL_RADIUS)*60);
   tTime[6] = millis();
-}
-
-void updateGoalVelocity(void)
-{
-  goal_velocity[LINEAR] = goal_velocity_from_cmd[LINEAR];
-  goal_velocity[ANGULAR] = goal_velocity_from_cmd[ANGULAR];
 }
 
 bool calcOdometry(double diff_time)

@@ -6,11 +6,11 @@ float value[2] = {0.5,1};
 void setup()
 {
   motor.init();
+  motor.setSetpointL(100);
   Serial.begin(9600);
 }
 
 long t = millis();
-
 void loop()
 {
   if(millis() - t > 100){
