@@ -42,6 +42,7 @@ class motor_driver
         int32_t getRightencoder();
         void PID(double);
 	    double getSpeedL();
+        double getSpeedR();
 	    void setSetpointL(float);
 	    void setSetpointR(float);
         void setpulseR_PID(float);

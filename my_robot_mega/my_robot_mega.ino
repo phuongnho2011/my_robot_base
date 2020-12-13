@@ -212,6 +212,11 @@ void updateVariable(bool isConnected)
 
 void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
 {
+  if(cmd_vel_msg.linear.x == 0 && cmd_vel_msg.angular.z == 0)
+  {
+    mt_driver.setSetpointL(0);
+    mt_driver.setSetpointR(0);
+  }
   mt_driver.setSetpointL((cmd_vel_msg.linear.x + cmd_vel_msg.angular.z*WHEEL_SEPRATION/2)/(2*3.14159265359*WHEEL_RADIUS)*60);
   mt_driver.setSetpointR((cmd_vel_msg.linear.x - cmd_vel_msg.angular.z*WHEEL_SEPRATION/2)/(2*3.14159265359*WHEEL_RADIUS)*60);
   tTime[6] = millis();
