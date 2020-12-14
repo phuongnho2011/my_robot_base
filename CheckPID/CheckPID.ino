@@ -7,7 +7,7 @@ void setup()
 {
   motor.init();
   //motor.setSetpointL(100);
-  motor.setSetpointR(-50);
+  motor.setSetpointR(144);
   Serial.begin(9600);
 }
 

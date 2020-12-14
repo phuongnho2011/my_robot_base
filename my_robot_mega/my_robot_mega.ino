@@ -6,7 +6,7 @@ float value[2] = {0.5,1};
 
 void setup() {
   // Initialize ROS node handle, advertise and subscribe the topics 
-  nh.getHardware()->setBaud(115200);
+  nh.getHardware()->setBaud(57600);
   nh.initNode();
   nh.subscribe(cmd_vel_sub);
   nh.advertise(odom_pub);
@@ -44,17 +44,19 @@ void loop() {
     }
     else
     {
+      sprintf(test, "Test = %i", int32_t(millis() - tTime[0]));
+      nh.loginfo(test);
       mt_driver.PID(millis() - tTime[0]);
-      tTime[0] = millis();
     }
+    updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
+    publishDriveInformation();
+    tTime[0] = millis();
   }
   
-  if ((millis()-tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
-  {
-      updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
-      publishDriveInformation();
-      tTime[2] = millis();
-  }
+//  if ((millis()-tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
+//  {
+//    tTime[2] = millis();    
+//  }
 
 
   nh.spinOnce();
@@ -113,8 +115,8 @@ void publishDriveInformation(void)
   prev_update_time = time_now;
   ros::Time stamp_now = rosNow();
 
-  // calculate odometry
-  calcOdometry((double)(step_time * 0.001));
+  //calculate odometry
+  calcOdometry();
 
   // odometry
   updateOdometry();
@@ -223,26 +225,18 @@ void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
 }
 
 bool calcOdometry(double diff_time)
-{
-  float* orientation;
+{       
   double wheel_l, wheel_r;      // rotation value of wheel [rad]
   double delta_s, theta, delta_theta;
   static double last_theta = 0.0;
   double v, w;                  // v = translational velocity [m/s], w = rotational velocity [rad/s]
-  double step_time;
 
   wheel_l = wheel_r = 0.0;
   delta_s = delta_theta = theta = 0.0;
   v = w = 0.0;
-  step_time = 0.0;
 
-  step_time = diff_time;
-
-  if (step_time == 0)
-    return false;
-
-  wheel_l = PULSE2RADL*(double)last_diff_pulse[LEFT];
-  wheel_r = PULSE2RADR*(double)last_diff_pulse[RIGHT];
+  wheel_l = PULSE2RADL*mt_driver.getLeftencoder();
+  wheel_r = PULSE2RADR*mt_driver.getRightencoder();
   
   if(isnan(wheel_l))
     wheel_l = 0.0;
@@ -261,15 +255,15 @@ bool calcOdometry(double diff_time)
 
   // compute odometric instantaneouse velocity
 
-  v = delta_s / step_time;
+  v = (mt_driver.getSpeedL()*PULSE2RADL*1000.0/60.0 + mt_driver.getSpeedR()*PULSE2RADR*1000.0/60.0)/2.0;
   w = delta_theta / step_time;
 
   odom_vel[0] = v;
   odom_vel[1] = 0.0;
   odom_vel[2] = w;
 
-  last_velocity[LEFT]  = wheel_l / step_time;
-  last_velocity[RIGHT] = wheel_r / step_time;
+  last_velocity[LEFT]  = mt_driver.getSpeedL()*PULSE2RADL*1000.0/60.0;
+  last_velocity[RIGHT] = mt_driver.getSpeedR()*PULSE2RADR*1000.0/60.0;
   last_theta = theta;
 
   return true;
@@ -285,49 +279,14 @@ void updateJointStates(void)
   static float joint_states_pos[WHEEL_NUM] = {0.0, 0.0};
   static float joint_states_vel[WHEEL_NUM] = {0.0, 0.0};
 
-  joint_states_pos[LEFT]  = last_rad[LEFT];
-  joint_states_pos[RIGHT] = last_rad[RIGHT];
+  joint_states_pos[LEFT]  = PULSE2RADL * (double)mt_driver.getLeftencoder();
+  joint_states_pos[RIGHT] = PULSE2RADR * (double)mt_driver.getRightencoder();
 
   joint_states_vel[LEFT]  = last_velocity[LEFT];
   joint_states_vel[RIGHT] = last_velocity[RIGHT];
 
   joint_states.position = joint_states_pos;
   joint_states.velocity = joint_states_vel;
-}
-
-void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
-{
-  int32_t current_pulse = 0;
-  static int32_t last_pulse[WHEEL_NUM] = {0, 0};
-
-  if(init_encoder)
-  {
-    for(int index = 0; index < WHEEL_NUM; index++)
-    {
-      last_diff_pulse[index] = 0;
-      last_pulse[index] = 0;
-      last_rad[index] = 0.0;
-
-      last_velocity[index] = 0.0;
-    }
-
-    last_pulse[LEFT] = left_pulse;
-    last_pulse[RIGHT] = right_pulse;
-    init_encoder = false;
-    return;
-  }
-
-  current_pulse = left_pulse;
-
-  last_diff_pulse[LEFT] = current_pulse - last_pulse[LEFT];
-  last_pulse[LEFT]      = current_pulse;
-  last_rad[LEFT]       += PULSE2RADL * (double)last_diff_pulse[LEFT];
-
-  current_pulse = right_pulse;
-
-  last_diff_pulse[RIGHT] = current_pulse - last_pulse[RIGHT];
-  last_pulse[RIGHT]      = current_pulse;
-  last_rad[RIGHT]       += PULSE2RADR * (double)last_diff_pulse[RIGHT];
 }
 
 void motor_driver::cal_encoderL()

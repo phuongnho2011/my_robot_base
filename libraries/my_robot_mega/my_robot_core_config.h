@@ -41,8 +41,8 @@
 #define LINEAR          0                       /*!< Linear velocity index */
 #define ANGULAR         1                       /*!< Angular velocity index */
 
-#define PULSE2RADR                         0.062831853  // 1[pulse] * 2 * 3.14159265359 / 1000 = 0.010199976f
-#define PULSE2RADL                         0.062831853 
+#define PULSE2RADR                         0.006283185  // 1[pulse] * 2 * 3.14159265359 / 1000 = 0.010199976f
+#define PULSE2RADL                         0.006283185 
 
 //#define MIN_LINEAR_VELOCITY  -7.01
 //#define MAX_LINEAR_VELOCITY  7.01
