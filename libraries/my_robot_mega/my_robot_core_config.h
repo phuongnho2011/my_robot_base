@@ -27,7 +27,7 @@
 
 /* Frequency of publish/subscribe */
 #define CONTROL_MOTOR_SPEED_FREQUENCY          10      /*!< Frequency in Hz to control motor */
-#define CONTROL_MOTOR_TIMEOUT                  600     /*!< Period in ms to check control motor timeout */
+#define CONTROL_MOTOR_TIMEOUT                  500     /*!< Period in ms to check control motor timeout */
 #define CMD_VEL_PUBLISH_FREQUENCY              5       	/*!< Frequency in Hz to publish robot velocity */
 #define DRIVE_INFORMATION_PUBLISH_FREQUENCY    5       	/*!< Frequency in Hz to publish drive information */
 #define DEBUG_LOG_FREQUENCY                    10       /*!< Frequency in Hz to send log debug messages */

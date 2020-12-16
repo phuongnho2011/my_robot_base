@@ -2,8 +2,6 @@
 #include <my_motor_driver.h>
 #include <my_robot_core_config.h>
 
-float value[2] = {0.5,1};
-
 void setup() {
   // Initialize ROS node handle, advertise and subscribe the topics 
   nh.getHardware()->setBaud(57600);
@@ -23,9 +21,6 @@ void setup() {
   initOdom();
 
   initJointStates();
-
-  prev_update_time = millis();
-  
 }
 
 char test[50];
@@ -34,33 +29,30 @@ void loop() {
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
   
-  if((millis() - tTime[0]) >= (1000/CONTROL_MOTOR_SPEED_FREQUENCY))
+  if((millis() - tTime[0]) >= 1000/CONTROL_MOTOR_SPEED_FREQUENCY)
   {
     if(millis() - tTime[6] >= CONTROL_MOTOR_TIMEOUT)
     {
       mt_driver.setSetpointL(0);
       mt_driver.setSetpointR(0);
+      mt_driver.setpulseL_PID(0);
+      mt_driver.setpulseR_PID(0);
       tTime[6] = millis();
     }
     else
     {
-      sprintf(test, "Test = %i", int32_t(millis() - tTime[0]));
-      nh.loginfo(test);
       mt_driver.PID(millis() - tTime[0]);
+      calcOdometry(millis() - tTime[0]);
     }
-    updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
-    publishDriveInformation();
     tTime[0] = millis();
   }
   
-//  if ((millis()-tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
-//  {
-//    tTime[2] = millis();    
-//  }
-
-
+  if ((millis()-tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
+  {
+    publishDriveInformation();  
+    tTime[2] = millis();  
+  }
   nh.spinOnce();
-  // Wait the serial link time to process
   waitForSerialLink(nh.connected());
 }
 
@@ -109,15 +101,8 @@ void updateTF(geometry_msgs::TransformStamped& odom_tf)
 
 void publishDriveInformation(void)
 {
-  unsigned long time_now = millis();
-  unsigned long step_time = time_now - prev_update_time;
-
-  prev_update_time = time_now;
   ros::Time stamp_now = rosNow();
-
-  //calculate odometry
-  calcOdometry();
-
+  
   // odometry
   updateOdometry();
   odom.header.stamp = stamp_now;
@@ -218,6 +203,8 @@ void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
   {
     mt_driver.setSetpointL(0);
     mt_driver.setSetpointR(0);
+    mt_driver.setpulseL_PID(0);
+    mt_driver.setpulseR_PID(0);
   }
   mt_driver.setSetpointL((cmd_vel_msg.linear.x + cmd_vel_msg.angular.z*WHEEL_SEPRATION/2)/(2*3.14159265359*WHEEL_RADIUS)*60);
   mt_driver.setSetpointR((cmd_vel_msg.linear.x - cmd_vel_msg.angular.z*WHEEL_SEPRATION/2)/(2*3.14159265359*WHEEL_RADIUS)*60);
@@ -230,13 +217,17 @@ bool calcOdometry(double diff_time)
   double delta_s, theta, delta_theta;
   static double last_theta = 0.0;
   double v, w;                  // v = translational velocity [m/s], w = rotational velocity [rad/s]
-
+  double step_time;
+  
   wheel_l = wheel_r = 0.0;
   delta_s = delta_theta = theta = 0.0;
   v = w = 0.0;
-
+  step_time = 0.0;
+  
   wheel_l = PULSE2RADL*mt_driver.getLeftencoder();
   wheel_r = PULSE2RADR*mt_driver.getRightencoder();
+
+  step_time = diff_time;
   
   if(isnan(wheel_l))
     wheel_l = 0.0;
@@ -255,8 +246,8 @@ bool calcOdometry(double diff_time)
 
   // compute odometric instantaneouse velocity
 
-  v = (mt_driver.getSpeedL()*PULSE2RADL*1000.0/60.0 + mt_driver.getSpeedR()*PULSE2RADR*1000.0/60.0)/2.0;
-  w = delta_theta / step_time;
+  v = (mt_driver.getSpeedL()*PULSE2RADL + mt_driver.getSpeedR()*PULSE2RADR)*WHEEL_RADIUS*1000.0/60.0/2.0;
+  w = delta_theta / step_time ;
 
   odom_vel[0] = v;
   odom_vel[1] = 0.0;

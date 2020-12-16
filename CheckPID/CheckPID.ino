@@ -20,12 +20,10 @@ void loop()
   Serial.println(motor.getSpeedR());
   t = millis();
   }
-  
   //Serial.println(motor.getRightencoder());
   if(millis() - t2 > 10000)
   {
     motor.setSetpointR(0);
-    //motor.setSetpointL(0);
   }
 }
 
