@@ -13,7 +13,10 @@ class my_imu
         void calculateIMU(void);
         double getcompAngleX();
         double getcompAngleY();
-        double getcompAngleZ(); 
+        double getcompAngleZ();
+        double getgyroXrate();
+        double getgyroYrate();
+        double getgyroZrate();   
         void setupoffsetIMU(void);
     private:
         /* IMU Data */

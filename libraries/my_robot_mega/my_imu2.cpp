@@ -113,3 +113,15 @@ double my_imu::getcompAngleZ()
 {
     return compAngleZ;
 }
+double my_imu::getgyroXrate()
+{
+    return gyroXrate;
+}
+double my_imu::getgyroYrate()
+{
+    return gyroYrate;
+}
+double my_imu::getgyroZrate()
+{
+    return gyroZrate;
+}
