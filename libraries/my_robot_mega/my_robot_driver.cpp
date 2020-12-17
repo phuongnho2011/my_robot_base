@@ -27,13 +27,14 @@ void motor_driver::init()
     E1_R = 0, E1_1_R = 0, E1_2_R = 0;
     OutputR = 0, LastOutputR = 0;
     // KpR = 1000, KdR = 23.0, KiR = 10.0;
-    KpR = 41.8, KdR = 12.2, KiR = 7.1;
-
+    //KpR = 41.8, KdR = 12.2, KiR = 7.1;
+    KpR =1050, KdR = 20.0, KiR = 2.5;
+    //KpR =720, KdR = 10, KiR = 0;
     speedL = 0.00, pre_speedL = 0.00;
     E1_L = 0, E1_1_L = 0, E1_2_L = 0;
     OutputL = 0, LastOutputL = 0;
     // KpL = 1200, KdL = 18.0, KiL = 8.0;
-    KpL = 148, KdL = 15, KiL = 8;
+    KpL = 140, KdL = 15, KiL = 8;
 
     attachInterrupt(digitalPinToInterrupt(A1),cal_encoderL,CHANGE);
     attachInterrupt(digitalPinToInterrupt(A2),cal_encoderR,CHANGE);
@@ -179,16 +180,6 @@ void motor_driver::read_EncoderR()
     }
 }
 
-int32_t motor_driver::getLeftencoder()
-{
-    return pulsesL;
-}
-
-int32_t motor_driver::getRightencoder()
-{
-    return pulsesR;
-}
-
 void motor_driver::PID(double time)
 {
     if(setpointL == 0 && setpointR != 0)
@@ -203,7 +194,7 @@ void motor_driver::PID(double time)
         OutputL = 0;
 
         T = time/1000;
-        speedR = (pulseR_PID/1000)*(1/T)*60;
+        speedR = (pulseR_PID/1050)*(1/T)*60;
         speedR = speedR * LPF_heso + pre_speedR * (1-LPF_heso);
         pre_speedR = speedR;
         pulseR_PID = 0;
@@ -426,4 +417,14 @@ void motor_driver::setpulseL_PID(float pulse)
 void motor_driver::setpulseR_PID(float pulse)
 {
     pulseR_PID = pulse;
+}
+
+int32_t motor_driver::getLeftencoder()
+{
+    return pulsesL;
+}
+
+int32_t motor_driver::getRightencoder()
+{
+    return pulsesR;
 }

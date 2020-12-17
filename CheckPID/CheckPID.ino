@@ -1,4 +1,5 @@
 #include <my_motor_driver.h>
+#include <TimerOne.h>
 
 motor_driver motor;
 float value[2] = {0.5,1};
@@ -7,24 +8,15 @@ void setup()
 {
   motor.init();
   //motor.setSetpointL(100);
-  motor.setSetpointR(144);
+  motor.setSetpointR(50);
   Serial.begin(9600);
+  Timer1.initialize(20000);
+  Timer1.attachInterrupt(PID);
 }
 
-long t = millis();
-long t2 = millis();
 void loop()
-{
-  if(millis() - t > 100){
-  motor.PID(millis() - t);
+{ 
   Serial.println(motor.getSpeedR());
-  t = millis();
-  }
-  //Serial.println(motor.getRightencoder());
-  if(millis() - t2 > 10000)
-  {
-    motor.setSetpointR(0);
-  }
 }
 
 void motor_driver::cal_encoderL()
@@ -35,4 +27,9 @@ void motor_driver::cal_encoderL()
 void motor_driver::cal_encoderR()
 {
   motor.read_EncoderR();
+}
+
+void PID()
+{
+  motor.PID(20);
 }
