@@ -23,7 +23,7 @@ void setup() {
 
   initJointStates();
 
-  Timer1.initialize(20000);
+  Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
 }
 
@@ -33,7 +33,14 @@ void loop() {
   updateTime();
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
-  calcOdometry(20);
+  if(millis() - tTime[6] > CONTROL_MOTOR_TIMEOUT)
+  { 
+    mt_driver.setSetpointL(0);
+    mt_driver.setSetpointR(0);
+    mt_driver.setpulseL_PID(0);
+    mt_driver.setpulseR_PID(0);
+  }
+  calcOdometry(10);
   publishDriveInformation();
   nh.spinOnce();
   waitForSerialLink(nh.connected());
@@ -41,7 +48,7 @@ void loop() {
 
 void PID()
 {
-  mt_driver.PID(20); 
+  mt_driver.PID(); 
 }
 
 void initJointStates(void)
@@ -187,15 +194,13 @@ void updateVariable(bool isConnected)
 
 void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
 {
+  mt_driver.setSetpointL((cmd_vel_msg.linear.x + cmd_vel_msg.angular.z * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 3.2);
+  mt_driver.setSetpointR((cmd_vel_msg.linear.x - cmd_vel_msg.angular.z * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 5);
   if (cmd_vel_msg.linear.x == 0 && cmd_vel_msg.angular.z == 0)
   {
-    mt_driver.setSetpointL(0);
-    mt_driver.setSetpointR(0);
     mt_driver.setpulseL_PID(0);
     mt_driver.setpulseR_PID(0);
   }
-  mt_driver.setSetpointL((cmd_vel_msg.linear.x + cmd_vel_msg.angular.z * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60);
-  mt_driver.setSetpointR((cmd_vel_msg.linear.x - cmd_vel_msg.angular.z * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60);
   tTime[6] = millis();
 }
 

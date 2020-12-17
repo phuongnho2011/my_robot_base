@@ -25,6 +25,8 @@
 #define LIN 0
 #define RAD 1
 
+#define LPF_heso 0.08
+
 
 class motor_driver
 {
@@ -40,7 +42,7 @@ class motor_driver
         static void cal_encoderR();
         int32_t getLeftencoder();
         int32_t getRightencoder();
-        void PID(double);
+        void PID();
 	    double getSpeedL();
         double getSpeedR();
 	    void setSetpointL(float);
@@ -50,8 +52,8 @@ class motor_driver
     private:
         int32_t pulsesL, pulsesR;
         //PID
-	double T;
-        double LPF_heso=0.08 ;
+	    double T;
+        
         double pulseR_PID;
         double speedR, setpointR, pre_speedR;
         double E1_R, E1_1_R, E1_2_R;

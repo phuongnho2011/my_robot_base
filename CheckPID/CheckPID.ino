@@ -7,16 +7,18 @@ float value[2] = {0.5,1};
 void setup()
 {
   motor.init();
-  //motor.setSetpointL(100);
-  motor.setSetpointR(50);
+  delay(1000);
+  motor.setSetpointR(25); //cong them 5 vong
+  motor.setSetpointL(23.2); // cong them 3.2
   Serial.begin(9600);
-  Timer1.initialize(20000);
+  Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
 }
 
 void loop()
 { 
-  Serial.println(motor.getSpeedR());
+  Serial.println(motor.getSpeedL());
+  //Serial.println(motor.getLeftencoder());
 }
 
 void motor_driver::cal_encoderL()
@@ -31,5 +33,5 @@ void motor_driver::cal_encoderR()
 
 void PID()
 {
-  motor.PID(20);
+  motor.PID(10);
 }

@@ -22,19 +22,18 @@ void motor_driver::init()
     pinMode(INT1_L, OUTPUT); //chan DIR1
     pinMode(INT2_L, OUTPUT); //chan DIR2
 
-    T = 0;
+    T = 0.01;
     speedR = 0.00, pre_speedR = 0.00;
     E1_R = 0, E1_1_R = 0, E1_2_R = 0;
     OutputR = 0, LastOutputR = 0;
-    // KpR = 1000, KdR = 23.0, KiR = 10.0;
-    //KpR = 41.8, KdR = 12.2, KiR = 7.1;
-    KpR =1050, KdR = 20.0, KiR = 2.5;
-    //KpR =720, KdR = 10, KiR = 0;
+    KpR = 1300, KdR = 23.0, KiR = 10.0;
+  
+
     speedL = 0.00, pre_speedL = 0.00;
     E1_L = 0, E1_1_L = 0, E1_2_L = 0;
     OutputL = 0, LastOutputL = 0;
-    // KpL = 1200, KdL = 18.0, KiL = 8.0;
-    KpL = 140, KdL = 15, KiL = 8;
+    KpL = 1300, KdL = 23.0, KiL = 10.0;
+  
 
     attachInterrupt(digitalPinToInterrupt(A1),cal_encoderL,CHANGE);
     attachInterrupt(digitalPinToInterrupt(A2),cal_encoderR,CHANGE);
@@ -180,7 +179,7 @@ void motor_driver::read_EncoderR()
     }
 }
 
-void motor_driver::PID(double time)
+void motor_driver::PID()
 {
     if(setpointL == 0 && setpointR != 0)
     {
@@ -193,7 +192,6 @@ void motor_driver::PID(double time)
         alphaL = 0; betaL = 0; gamaL = 0;
         OutputL = 0;
 
-        T = time/1000;
         speedR = (pulseR_PID/1050)*(1/T)*60;
         speedR = speedR * LPF_heso + pre_speedR * (1-LPF_heso);
         pre_speedR = speedR;
@@ -244,8 +242,7 @@ void motor_driver::PID(double time)
         alphaR = 0; betaR = 0; gamaR = 0;
         OutputR = 0;
 
-        T = time/1000;
-        speedL = (pulseL_PID/1000)*(1/T)*60;
+        speedL = (pulseL_PID/1050)*(1/T)*60;
         speedL = speedL * LPF_heso + pre_speedL * (1-LPF_heso);
         pre_speedL = speedL;
         pulseL_PID = 0;
@@ -306,9 +303,7 @@ void motor_driver::PID(double time)
     }
     else
     {
-        T = time/1000;
-
-        speedR = (pulseR_PID/1000)*(1/T)*60;
+        speedR = (pulseR_PID/1050)*(1/T)*60;
         speedR = speedR * LPF_heso + pre_speedR * (1-LPF_heso);
         pre_speedR = speedR;
         pulseR_PID = 0;
@@ -323,7 +318,7 @@ void motor_driver::PID(double time)
         E1_2_R = E1_1_R;
         E1_1_R = E1_R;
         
-        speedL = (pulseL_PID/1000)*(1/T)*60;
+        speedL = (pulseL_PID/1050)*(1/T)*60;
         speedL = speedL * LPF_heso + pre_speedL * (1-LPF_heso);
         pre_speedL = speedL;
         pulseL_PID = 0;
