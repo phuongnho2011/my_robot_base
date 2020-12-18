@@ -26,6 +26,8 @@ void setup() {
 
   Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
+
+  prev_update_time = millis();
 }
 
 char test[50];
@@ -41,7 +43,6 @@ void loop() {
     mt_driver.setpulseL_PID(0);
     mt_driver.setpulseR_PID(0);
   }
-  calcOdometry();
   imu.calculateIMU();
   publishDriveInformation();
   nh.spinOnce();
@@ -124,7 +125,13 @@ void updateTF(geometry_msgs::TransformStamped& odom_tf)
 
 void publishDriveInformation(void)
 {
+  unsigned long time_now = millis();
+  unsigned long step_time = time_now - prev_update_time;
+
+  prev_update_time = time_now;
   ros::Time stamp_now = rosNow();
+
+  calcOdometry((double)step_time*0.001);
 
   // odometry
   updateOdometry();
@@ -206,7 +213,7 @@ void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
   tTime[6] = millis();
 }
 
-bool calcOdometry()
+bool calcOdometry(double diff_time)
 {
   double wheel_l, wheel_r;      // rotation value of wheel [rad]
   double delta_s, theta, delta_theta;
@@ -217,6 +224,8 @@ bool calcOdometry()
   wheel_l = wheel_r = 0.0;
   delta_s = delta_theta = theta = 0.0;
   v = w = 0.0;
+  step_time = 0;
+  step_time = diff_time;
 
   wheel_l = PULSE2RADL * mt_driver.getLeftencoder();
   wheel_r = PULSE2RADR * mt_driver.getRightencoder();
@@ -228,7 +237,8 @@ bool calcOdometry()
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  delta_theta = imu.getgyroZangle();
+  theta = imu.getgyroZangle();
+  delta_theta = theta - last_theta;
 
   // compute odometric pose
   odom_pose[0] += delta_s * cos(odom_pose[2] + (delta_theta / 2.0));
