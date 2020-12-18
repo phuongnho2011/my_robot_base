@@ -33,5 +33,5 @@ void motor_driver::cal_encoderR()
 
 void PID()
 {
-  motor.PID(10);
+  motor.PID();
 }

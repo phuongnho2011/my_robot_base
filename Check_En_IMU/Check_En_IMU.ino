@@ -11,5 +11,6 @@ void setup() {
 
 void loop() {
   imu.calculateIMU();
-  Serial.println(imu.getgyroXrate());
+  //Serial.println(imu.getGyroZerror());
+  Serial.println(imu.getgyroZangle());
 }

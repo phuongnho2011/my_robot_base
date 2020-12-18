@@ -14,7 +14,8 @@ void setup() {
 
   // setting for imu
   imu.init();
-
+  imu.calculate_IMU_error();
+  
   // setting for motors
   mt_driver.init();
 
@@ -40,7 +41,8 @@ void loop() {
     mt_driver.setpulseL_PID(0);
     mt_driver.setpulseR_PID(0);
   }
-  calcOdometry(10);
+  calcOdometry();
+  imu.calculateIMU();
   publishDriveInformation();
   nh.spinOnce();
   waitForSerialLink(nh.connected());
@@ -48,7 +50,7 @@ void loop() {
 
 void PID()
 {
-  mt_driver.PID(); 
+  mt_driver.PID();
 }
 
 void initJointStates(void)
@@ -204,7 +206,7 @@ void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
   tTime[6] = millis();
 }
 
-bool calcOdometry(double diff_time)
+bool calcOdometry()
 {
   double wheel_l, wheel_r;      // rotation value of wheel [rad]
   double delta_s, theta, delta_theta;
@@ -215,12 +217,9 @@ bool calcOdometry(double diff_time)
   wheel_l = wheel_r = 0.0;
   delta_s = delta_theta = theta = 0.0;
   v = w = 0.0;
-  step_time = 0.0;
 
   wheel_l = PULSE2RADL * mt_driver.getLeftencoder();
   wheel_r = PULSE2RADR * mt_driver.getRightencoder();
-
-  step_time = diff_time;
 
   if (isnan(wheel_l))
     wheel_l = 0.0;
@@ -229,8 +228,7 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  theta = imu.getcompAngleX();
-  delta_theta = theta - last_theta;
+  delta_theta = imu.getgyroZangle();
 
   // compute odometric pose
   odom_pose[0] += delta_s * cos(odom_pose[2] + (delta_theta / 2.0));
@@ -240,7 +238,7 @@ bool calcOdometry(double diff_time)
   // compute odometric instantaneouse velocity
 
   v = (mt_driver.getSpeedL() * PULSE2RADL + mt_driver.getSpeedR() * PULSE2RADR) * WHEEL_RADIUS * 1000.0 / 60.0 / 2.0;
-  w = delta_theta / step_time ;
+  w = imu.getGyroZ();
 
   odom_vel[0] = v;
   odom_vel[1] = 0.0;
