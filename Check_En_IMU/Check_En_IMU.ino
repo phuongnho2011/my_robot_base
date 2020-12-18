@@ -1,12 +1,15 @@
 #include <my_imu2.h>
 #include <my_motor_driver.h>
 
-void setup() {
-  // put your setup code here, to run once:
+my_imu imu(0x68);
 
+void setup() {
+  Serial.begin(115200);
+  imu.init();
+  imu.calculate_IMU_error();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  imu.calculateIMU();
+  Serial.println(imu.getgyroXrate());
 }
