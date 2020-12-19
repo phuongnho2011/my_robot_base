@@ -39,7 +39,7 @@ void loop() {
   updateTime();
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
-  
+
   if (t - tTime[6] > CONTROL_MOTOR_TIMEOUT)
   {
     mt_driver.setSetpointL(0);
@@ -47,15 +47,16 @@ void loop() {
     mt_driver.setpulseL_PID(0);
     mt_driver.setpulseR_PID(0);
   }
-  
+
   if ((t - tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
   {
+    updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
     publishDriveInformation();
     tTime[2] = t;
   }
 
-  if((t - tTime[3]) >= (1000/ IMU_CALCULATE_FREQUENCY))
-  { 
+  if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
+  {
     mpu.update();
     tTime[3] = t;
   }
@@ -215,6 +216,36 @@ void updateVariable(bool isConnected)
   }
 }
 
+void updateJointStates(void)
+{
+  static float joint_states_pos[WHEEL_NUM] = {0.0, 0.0};
+  static float joint_states_vel[WHEEL_NUM] = {0.0, 0.0};
+
+  joint_states_pos[LEFT]  = PULSE2RADL * (double)mt_driver.getLeftencoder();
+  joint_states_pos[RIGHT] = PULSE2RADR * (double)mt_driver.getRightencoder();
+
+  joint_states_vel[LEFT]  = last_velocity[LEFT];
+  joint_states_vel[RIGHT] = last_velocity[RIGHT];
+
+  joint_states.position = joint_states_pos;
+  joint_states.velocity = joint_states_vel;
+}
+
+void updateJointStates(void)
+{
+  static float joint_states_pos[WHEEL_NUM] = {0.0, 0.0};
+  static float joint_states_vel[WHEEL_NUM] = {0.0, 0.0};
+
+  joint_states_pos[LEFT]  = PULSE2RADL * (double)mt_driver.getLeftencoder();
+  joint_states_pos[RIGHT] = PULSE2RADR * (double)mt_driver.getRightencoder();
+
+  joint_states_vel[LEFT]  = last_velocity[LEFT];
+  joint_states_vel[RIGHT] = last_velocity[RIGHT];
+
+  joint_states.position = joint_states_pos;
+  joint_states.velocity = joint_states_vel;
+}
+
 void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
 {
   mt_driver.setSetpointL((cmd_vel_msg.linear.x + cmd_vel_msg.angular.z * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 3.2);
@@ -241,8 +272,12 @@ bool calcOdometry(double diff_time)
   step_time = 0;
   step_time = diff_time;
 
-  wheel_l = PULSE2RADL * mt_driver.getLeftencoder();
-  wheel_r = PULSE2RADR * mt_driver.getRightencoder();
+  if (step_time == 0)
+    return false;
+
+
+  wheel_l = PULSE2RAD * (double)last_diff_pulse[LEFT];
+  wheel_r = PULSE2RAD * (double)last_diff_pulse[RIGHT];
 
   if (isnan(wheel_l))
     wheel_l = 0.0;
@@ -251,8 +286,8 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  theta = atan2f(mpu.getQuaternionX() * mpu.getQuaternionW() + mpu.getQuaternionY() * mpu.getQuaternionZ(), 
-  0.5f - mpu.getQuaternionZ() * mpu.getQuaternionZ() - mpu.getQuaternionW() * mpu.getQuaternionW());
+  theta = atan2f(mpu.getQuaternionX() * mpu.getQuaternionW() + mpu.getQuaternionY() * mpu.getQuaternionZ(),
+                 0.5f - mpu.getQuaternionZ() * mpu.getQuaternionZ() - mpu.getQuaternionW() * mpu.getQuaternionW());
   delta_theta = theta - last_theta;
 
   // compute odometric pose
@@ -262,15 +297,15 @@ bool calcOdometry(double diff_time)
 
   // compute odometric instantaneouse velocity
 
-  v = (mt_driver.getSpeedL() * PULSE2RADL + mt_driver.getSpeedR() * PULSE2RADR) * WHEEL_RADIUS * 1000.0 / 60.0 / 2.0;
-  w = delta_theta/step_time;
+  v = delta_s / step_time;
+  w = delta_theta / step_time;
 
   odom_vel[0] = v;
   odom_vel[1] = 0.0;
   odom_vel[2] = w;
 
-  last_velocity[LEFT]  = mt_driver.getSpeedL() * PULSE2RADL * 1000.0 / 60.0;
-  last_velocity[RIGHT] = mt_driver.getSpeedR() * PULSE2RADR * 1000.0 / 60.0;
+  last_velocity[LEFT]  = wheel_l / step_time;
+  last_velocity[RIGHT] = wheel_r / step_time;
   last_theta = theta;
 
   return true;
@@ -279,21 +314,6 @@ bool calcOdometry(double diff_time)
 ros::Time rosNow()
 {
   return nh.now();
-}
-
-void updateJointStates(void)
-{
-  static float joint_states_pos[WHEEL_NUM] = {0.0, 0.0};
-  static float joint_states_vel[WHEEL_NUM] = {0.0, 0.0};
-
-  joint_states_pos[LEFT]  = PULSE2RADL * (double)mt_driver.getLeftencoder();
-  joint_states_pos[RIGHT] = PULSE2RADR * (double)mt_driver.getRightencoder();
-
-  joint_states_vel[LEFT]  = last_velocity[LEFT];
-  joint_states_vel[RIGHT] = last_velocity[RIGHT];
-
-  joint_states.position = joint_states_pos;
-  joint_states.velocity = joint_states_vel;
 }
 
 void motor_driver::cal_encoderL()
