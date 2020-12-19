@@ -1,4 +1,4 @@
-#include <my_imu2.h>
+#include <MPU9250.h>
 #include <my_motor_driver.h>
 #include <my_robot_core_config.h>
 #include <TimerOne.h>
@@ -13,9 +13,10 @@ void setup() {
   tf_broadcaster.init(nh);
 
   // setting for imu
-  imu.init();
-  imu.calculate_IMU_error();
-  
+  Wire.begin();
+  delay(2000);
+  mpu.setup(0x68);
+
   // setting for motors
   mt_driver.init();
 
@@ -33,18 +34,31 @@ void setup() {
 char test[50];
 unsigned int t, temp;
 void loop() {
+  delayMicroseconds(300);
+  uint32_t t = millis();
   updateTime();
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
-  if(millis() - tTime[6] > CONTROL_MOTOR_TIMEOUT)
-  { 
+  
+  if (t - tTime[6] > CONTROL_MOTOR_TIMEOUT)
+  {
     mt_driver.setSetpointL(0);
     mt_driver.setSetpointR(0);
     mt_driver.setpulseL_PID(0);
     mt_driver.setpulseR_PID(0);
   }
-  imu.calculateIMU();
-  publishDriveInformation();
+  
+  if ((t - tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
+  {
+    publishDriveInformation();
+    tTime[2] = t;
+  }
+
+  if((t - tTime[3]) >= (1000/ IMU_CALCULATE_FREQUENCY))
+  { 
+    mpu.update();
+    tTime[3] = t;
+  }
   nh.spinOnce();
   waitForSerialLink(nh.connected());
 }
@@ -131,7 +145,7 @@ void publishDriveInformation(void)
   prev_update_time = time_now;
   ros::Time stamp_now = rosNow();
 
-  calcOdometry((double)step_time*0.001);
+  calcOdometry((double)step_time * 0.001);
 
   // odometry
   updateOdometry();
@@ -237,7 +251,8 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  theta = imu.getgyroZangle();
+  theta = atan2f(mpu.getQuaternionX() * mpu.getQuaternionW() + mpu.getQuaternionY() * mpu.getQuaternionZ(), 
+  0.5f - mpu.getQuaternionZ() * mpu.getQuaternionZ() - mpu.getQuaternionW() * mpu.getQuaternionW());
   delta_theta = theta - last_theta;
 
   // compute odometric pose
@@ -248,7 +263,7 @@ bool calcOdometry(double diff_time)
   // compute odometric instantaneouse velocity
 
   v = (mt_driver.getSpeedL() * PULSE2RADL + mt_driver.getSpeedR() * PULSE2RADR) * WHEEL_RADIUS * 1000.0 / 60.0 / 2.0;
-  w = imu.getGyroZ();
+  w = delta_theta/step_time;
 
   odom_vel[0] = v;
   odom_vel[1] = 0.0;

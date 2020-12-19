@@ -30,6 +30,7 @@
 #define CONTROL_MOTOR_TIMEOUT                  800     /*!< Period in ms to check control motor timeout */
 #define CMD_VEL_PUBLISH_FREQUENCY              5       	/*!< Frequency in Hz to publish robot velocity */
 #define DRIVE_INFORMATION_PUBLISH_FREQUENCY    5       	/*!< Frequency in Hz to publish drive information */
+#define IMU_CALCULATE_FREQUENCY                15
 #define DEBUG_LOG_FREQUENCY                    10       /*!< Frequency in Hz to send log debug messages */
 
 /* Linear & Angular velocity index */
@@ -157,7 +158,7 @@ float goal_velocity_from_button[WHEEL_NUM] = {0.0, 0.0};
 float goal_velocity_from_cmd[WHEEL_NUM] = {0.0, 0.0};
 float goal_velocity_from_rc100[WHEEL_NUM] = {0.0, 0.0};
 
-my_imu imu(0x68);
+MPU9250 mpu;
 
 motor_driver mt_driver;
 
