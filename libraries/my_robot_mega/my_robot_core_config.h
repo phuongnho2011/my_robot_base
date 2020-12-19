@@ -159,7 +159,7 @@ float goal_velocity_from_button[WHEEL_NUM] = {0.0, 0.0};
 float goal_velocity_from_cmd[WHEEL_NUM] = {0.0, 0.0};
 float goal_velocity_from_rc100[WHEEL_NUM] = {0.0, 0.0};
 
-my_imu imu(0x68);
+MPU9250 mpu;
 
 motor_driver mt_driver;
 

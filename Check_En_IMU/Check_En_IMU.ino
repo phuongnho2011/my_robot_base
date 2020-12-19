@@ -1,17 +1,28 @@
-#include <my_imu2.h>
+#include <MPU9250.h>
 #include <my_motor_driver.h>
 
-my_imu mpu6050(0x68);
+MPU9250 mpu;
 
 void setup() {
-  // put your setup code here, to run once:
-  mpu6050.init();
-  mpu6050.calculate_IMU_error();
-  Serial.begin(9600);
+  Serial.begin(115200);
+  Wire.begin();
+  delay(2000);
+
+  mpu.setup(0x68);  // change to your own address
+  //
+  //  delay(2000);
+  //
+  //  // calibrate anytime you want to
+  //  mpu.calibrateAccelGyro();
+  //  mpu.calibrateMag();
+  //
+  //  mpu.printCalibration();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  mpu6050.calculateIMU();
-  Serial.println(mpu6050.getcompAngleX());
+  if (mpu.update()) {
+    float theta = atan2f(mpu.getQuaternionX() * mpu.getQuaternionW() + mpu.getQuaternionY() * mpu.getQuaternionZ(), 
+    0.5f - mpu.getQuaternionZ() * mpu.getQuaternionZ() - mpu.getQuaternionW() * mpu.getQuaternionW());
+    Serial.println(theta);
+  }
 }

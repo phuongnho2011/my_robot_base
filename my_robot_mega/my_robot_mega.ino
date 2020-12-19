@@ -1,4 +1,4 @@
-#include <my_imu2.h>
+#include <MPU9250.h>
 #include <my_motor_driver.h>
 #include <my_robot_core_config.h>
 
@@ -15,9 +15,10 @@ void setup() {
   tf_broadcaster.init(nh);
 
   // setting for imu
-  imu.init();
-  imu.calculate_IMU_error();
-
+  Wire.begin();
+  delay(2000);
+  mpu.setup(0x68);
+  
   // setting for motors
   mt_driver.init();
 
@@ -63,7 +64,7 @@ void loop() {
 
   if ((t-tTime[3]) >= (1000/15))
   {
-    imu.calculateIMU();
+    mpu.update();
     tTime[3] = t;
   }
    
@@ -285,7 +286,8 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  theta = imu.getcompAngleZ();
+  theta = atan2f(mpu.getQuaternionX() * mpu.getQuaternionW() + mpu.getQuaternionY() * mpu.getQuaternionZ(), 
+  0.5f - mpu.getQuaternionZ() * mpu.getQuaternionZ() - mpu.getQuaternionW() * mpu.getQuaternionW());
   delta_theta = theta - last_theta;
 
     // compute odometric pose
