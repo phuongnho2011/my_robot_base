@@ -231,21 +231,6 @@ void updateJointStates(void)
   joint_states.velocity = joint_states_vel;
 }
 
-void updateJointStates(void)
-{
-  static float joint_states_pos[WHEEL_NUM] = {0.0, 0.0};
-  static float joint_states_vel[WHEEL_NUM] = {0.0, 0.0};
-
-  joint_states_pos[LEFT]  = PULSE2RADL * (double)mt_driver.getLeftencoder();
-  joint_states_pos[RIGHT] = PULSE2RADR * (double)mt_driver.getRightencoder();
-
-  joint_states_vel[LEFT]  = last_velocity[LEFT];
-  joint_states_vel[RIGHT] = last_velocity[RIGHT];
-
-  joint_states.position = joint_states_pos;
-  joint_states.velocity = joint_states_vel;
-}
-
 void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
 {
   mt_driver.setSetpointL((cmd_vel_msg.linear.x + cmd_vel_msg.angular.z * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 3.2);
@@ -276,8 +261,8 @@ bool calcOdometry(double diff_time)
     return false;
 
 
-  wheel_l = PULSE2RAD * (double)last_diff_pulse[LEFT];
-  wheel_r = PULSE2RAD * (double)last_diff_pulse[RIGHT];
+  wheel_l = PULSE2RADL * (double)last_diff_pulse[LEFT];
+  wheel_r = PULSE2RADR * (double)last_diff_pulse[RIGHT];
 
   if (isnan(wheel_l))
     wheel_l = 0.0;
