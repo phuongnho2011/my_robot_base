@@ -22,7 +22,7 @@ void my_imu::calculate_IMU_error()
 {
     int c = 0;
    
-    while (c < 500)
+    while (c < 200)
     {
         Wire.beginTransmission(_imu_addr);
         Wire.write(0x3B); // starting with register 0x3B (ACCEL_XOUT_H)
@@ -36,11 +36,11 @@ void my_imu::calculate_IMU_error()
         accErrorZ = accErrorZ + atan(_AccZ / sqrt(_AccX * _AccX + _AccY * _AccY));
         c++;
     }
-    accErrorX = accErrorX / 500;
-    accErrorY = accErrorY / 500;
+    accErrorX = accErrorX / 200;
+    accErrorY = accErrorY / 200;
 
     c = 0;
-    while(c < 500)
+    while(c < 200)
     {
         Wire.beginTransmission(_imu_addr);
         Wire.write(0x43); 
@@ -52,6 +52,7 @@ void my_imu::calculate_IMU_error()
         gyroErrorX += _GyroX;
         gyroErrorY += _GyroY;
         gyroErrorZ += _GyroZ;
+        c++;
     }
     gyroErrorX = gyroErrorX/500;
     gyroErrorY = gyroErrorY/500;
