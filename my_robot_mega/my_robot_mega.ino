@@ -231,6 +231,41 @@ void updateJointStates(void)
   joint_states.velocity = joint_states_vel;
 }
 
+void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
+{
+  int32_t current_pulse = 0;
+  static int32_t last_pulse[WHEEL_NUM] = {0, 0};
+
+  if (init_encoder)
+  {
+    for (int index = 0; index < WHEEL_NUM; index++)
+    {
+      last_diff_pulse[index] = 0;
+      last_pulse[index] = 0;
+      last_rad[index] = 0.0;
+
+      last_velocity[index] = 0.0;
+    }
+
+    last_pulse[LEFT] = left_pulse;
+    last_pulse[RIGHT] = right_pulse;
+    init_encoder = false;
+    return;
+  }
+
+  current_pulse = left_pulse;
+
+  last_diff_pulse[LEFT] = current_pulse - last_pulse[LEFT];
+  last_pulse[LEFT]      = current_pulse;
+  last_rad[LEFT]       += PULSE2RADL * (double)last_diff_pulse[LEFT];
+
+  current_pulse = right_pulse;
+
+  last_diff_pulse[RIGHT] = current_pulse - last_pulse[RIGHT];
+  last_pulse[RIGHT]      = current_pulse;
+  last_rad[RIGHT]       += PULSE2RADR * (double)last_diff_pulse[RIGHT];
+}
+
 void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
 {
   mt_driver.setSetpointL((cmd_vel_msg.linear.x + cmd_vel_msg.angular.z * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 3.2);
