@@ -31,11 +31,11 @@ void setup() {
 }
 
 void loop() {
+  delayMicroseconds(300);
   uint32_t t = millis();
   updateTime();
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
-  imu.calculateIMU();
   // Call all the callbacks waiting to be called at that point in time
 
   // resize frequency of the motor
@@ -60,11 +60,17 @@ void loop() {
     publishDriveInformation();
     tTime[2] = t;
   }
+
+  if ((t-tTime[3]) >= (1000/15))
+  {
+    imu.calculateIMU();
+    tTime[3] = t;
+  }
    
   nh.spinOnce();
 
   // Wait the serial link time to process
-  //waitForSerialLink(nh.connected());
+  waitForSerialLink(nh.connected());
 }
 
 void initJointStates(void)
@@ -279,7 +285,7 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  theta = imu.getcompAngleX();
+  theta = imu.getcompAngleZ();
   delta_theta = theta - last_theta;
 
     // compute odometric pose

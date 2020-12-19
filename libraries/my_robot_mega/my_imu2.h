@@ -28,6 +28,7 @@ class my_imu
         double compAngleX, compAngleY, compAngleZ; // Calculated angle using a complementary filter
 
         double accErrorX, accErrorY, accErrorZ;
+        double gyroErrorX, gyroErrorY, gyroErrorZ;
         uint32_t timer;
         uint8_t i2cData[14]; // Buffer for I2C data
 
