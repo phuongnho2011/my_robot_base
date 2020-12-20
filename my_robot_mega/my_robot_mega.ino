@@ -270,7 +270,7 @@ void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
 
 void commandVelocityCallback(const geometry_msgs::Twist &cmd_vel_msg)
 {
-  goal_velocity_from_cmd[LINEAR] = constrain(cmd_vel_msg.linear.x;, MIN_LINEAR_VELOCITY, MAX_LINEAR_VELOCITY);
+  goal_velocity_from_cmd[LINEAR] = constrain(cmd_vel_msg.linear.x, MIN_LINEAR_VELOCITY, MAX_LINEAR_VELOCITY);
   goal_velocity_from_cmd[ANGULAR] = constrain(cmd_vel_msg.angular.z, MIN_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
 
   mt_driver.setSetpointL((goal_velocity_from_cmd[LINEAR] + goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 3.2);
