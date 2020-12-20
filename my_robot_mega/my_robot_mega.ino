@@ -312,8 +312,8 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  theta = atan2f(mpu.getQuaternionX() * mpu.getQuaternionW() + mpu.getQuaternionY() * mpu.getQuaternionZ(),
-                 0.5f - mpu.getQuaternionZ() * mpu.getQuaternionZ() - mpu.getQuaternionW() * mpu.getQuaternionW());
+  theta = atan2f(mpu.getQuaternionW() * mpu.getQuaternionZ() + mpu.getQuaternionX() * mpu.getQuaternionY(),
+                 0.5f - mpu.getQuaternionY() * mpu.getQuaternionY() - mpu.getQuaternionZ() * mpu.getQuaternionZ());
   delta_theta = theta - last_theta;
 
   // compute odometric pose
