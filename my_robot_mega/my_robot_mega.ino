@@ -3,7 +3,8 @@
 #include <my_robot_core_config.h>
 #include <TimerOne.h>
 
-void setup() {
+void setup()
+{
   // Initialize ROS node handle, advertise and subscribe the topics
   nh.getHardware()->setBaud(115200);
   nh.initNode();
@@ -33,7 +34,8 @@ void setup() {
 
 char test[50];
 unsigned int t, temp;
-void loop() {
+void loop()
+{
   delayMicroseconds(300);
   uint32_t t = millis();
   updateTime();
@@ -71,15 +73,15 @@ void PID()
 
 void initJointStates(void)
 {
-  static char *joint_states_name[] = {(char*)"wheel_left_joint", (char*)"wheel_right_joint"};
+  static char *joint_states_name[] = {(char *)"wheel_left_joint", (char *)"wheel_right_joint"};
 
   joint_states.header.frame_id = joint_state_header_frame_id;
-  joint_states.name            = joint_states_name;
+  joint_states.name = joint_states_name;
 
-  joint_states.name_length     = WHEEL_NUM;
+  joint_states.name_length = WHEEL_NUM;
   joint_states.position_length = WHEEL_NUM;
   joint_states.velocity_length = WHEEL_NUM;
-  joint_states.effort_length   = WHEEL_NUM;
+  joint_states.effort_length = WHEEL_NUM;
 }
 
 /*******************************************************************************
@@ -92,7 +94,7 @@ void initOdom(void)
   for (int index = 0; index < 3; index++)
   {
     odom_pose[index] = 0.0;
-    odom_vel[index]  = 0.0;
+    odom_vel[index] = 0.0;
   }
 
   odom.pose.pose.position.x = 0.0;
@@ -104,7 +106,7 @@ void initOdom(void)
   odom.pose.pose.orientation.z = 0.0;
   odom.pose.pose.orientation.w = 0.0;
 
-  odom.twist.twist.linear.x  = 0.0;
+  odom.twist.twist.linear.x = 0.0;
   odom.twist.twist.angular.z = 0.0;
 }
 
@@ -117,25 +119,25 @@ void updateTime()
 void updateOdometry(void)
 {
   odom.header.frame_id = odom_header_frame_id;
-  odom.child_frame_id  = odom_child_frame_id;
+  odom.child_frame_id = odom_child_frame_id;
 
   odom.pose.pose.position.x = odom_pose[0];
   odom.pose.pose.position.y = odom_pose[1];
   odom.pose.pose.position.z = 0;
   odom.pose.pose.orientation = tf::createQuaternionFromYaw(odom_pose[2]);
 
-  odom.twist.twist.linear.x  = odom_vel[0];
+  odom.twist.twist.linear.x = odom_vel[0];
   odom.twist.twist.angular.z = odom_vel[2];
 }
 
-void updateTF(geometry_msgs::TransformStamped& odom_tf)
+void updateTF(geometry_msgs::TransformStamped &odom_tf)
 {
   odom_tf.header = odom.header;
   odom_tf.child_frame_id = odom.child_frame_id;
   odom_tf.transform.translation.x = odom.pose.pose.position.x;
   odom_tf.transform.translation.y = odom.pose.pose.position.y;
   odom_tf.transform.translation.z = odom.pose.pose.position.z;
-  odom_tf.transform.rotation      = odom.pose.pose.orientation;
+  odom_tf.transform.rotation = odom.pose.pose.orientation;
 }
 
 void publishDriveInformation(void)
@@ -221,10 +223,10 @@ void updateJointStates(void)
   static float joint_states_pos[WHEEL_NUM] = {0.0, 0.0};
   static float joint_states_vel[WHEEL_NUM] = {0.0, 0.0};
 
-  joint_states_pos[LEFT]  = PULSE2RADL * (double)mt_driver.getLeftencoder();
+  joint_states_pos[LEFT] = PULSE2RADL * (double)mt_driver.getLeftencoder();
   joint_states_pos[RIGHT] = PULSE2RADR * (double)mt_driver.getRightencoder();
 
-  joint_states_vel[LEFT]  = last_velocity[LEFT];
+  joint_states_vel[LEFT] = last_velocity[LEFT];
   joint_states_vel[RIGHT] = last_velocity[RIGHT];
 
   joint_states.position = joint_states_pos;
@@ -256,34 +258,39 @@ void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
   current_pulse = left_pulse;
 
   last_diff_pulse[LEFT] = current_pulse - last_pulse[LEFT];
-  last_pulse[LEFT]      = current_pulse;
-  last_rad[LEFT]       += PULSE2RADL * (double)last_diff_pulse[LEFT];
+  last_pulse[LEFT] = current_pulse;
+  last_rad[LEFT] += PULSE2RADL * (double)last_diff_pulse[LEFT];
 
   current_pulse = right_pulse;
 
   last_diff_pulse[RIGHT] = current_pulse - last_pulse[RIGHT];
-  last_pulse[RIGHT]      = current_pulse;
-  last_rad[RIGHT]       += PULSE2RADR * (double)last_diff_pulse[RIGHT];
+  last_pulse[RIGHT] = current_pulse;
+  last_rad[RIGHT] += PULSE2RADR * (double)last_diff_pulse[RIGHT];
 }
 
-void commandVelocityCallback(const geometry_msgs::Twist& cmd_vel_msg)
+void commandVelocityCallback(const geometry_msgs::Twist &cmd_vel_msg)
 {
-  mt_driver.setSetpointL((cmd_vel_msg.linear.x + cmd_vel_msg.angular.z * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 3.2);
-  mt_driver.setSetpointR((cmd_vel_msg.linear.x - cmd_vel_msg.angular.z * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 5);
+  goal_velocity_from_cmd[LINEAR] = constrain(cmd_vel_msg.linear.x;, MIN_LINEAR_VELOCITY, MAX_LINEAR_VELOCITY);
+  goal_velocity_from_cmd[ANGULAR] = constrain(cmd_vel_msg.angular.z, MIN_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
+
+  mt_driver.setSetpointL((goal_velocity_from_cmd[LINEAR] + goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 3.2);
+  mt_driver.setSetpointR((goal_velocity_from_cmd[LINEAR] - goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 5);
+
   if (cmd_vel_msg.linear.x == 0 && cmd_vel_msg.angular.z == 0)
   {
     mt_driver.setpulseL_PID(0);
     mt_driver.setpulseR_PID(0);
   }
+
   tTime[6] = millis();
 }
 
 bool calcOdometry(double diff_time)
 {
-  double wheel_l, wheel_r;      // rotation value of wheel [rad]
+  double wheel_l, wheel_r; // rotation value of wheel [rad]
   double delta_s, theta, delta_theta;
   static double last_theta = 0.0;
-  double v, w;                  // v = translational velocity [m/s], w = rotational velocity [rad/s]
+  double v, w; // v = translational velocity [m/s], w = rotational velocity [rad/s]
   double step_time;
 
   wheel_l = wheel_r = 0.0;
@@ -294,7 +301,6 @@ bool calcOdometry(double diff_time)
 
   if (step_time == 0)
     return false;
-
 
   wheel_l = PULSE2RADL * (double)last_diff_pulse[LEFT];
   wheel_r = PULSE2RADR * (double)last_diff_pulse[RIGHT];
@@ -324,7 +330,7 @@ bool calcOdometry(double diff_time)
   odom_vel[1] = 0.0;
   odom_vel[2] = w;
 
-  last_velocity[LEFT]  = wheel_l / step_time;
+  last_velocity[LEFT] = wheel_l / step_time;
   last_velocity[RIGHT] = wheel_r / step_time;
   last_theta = theta;
 
