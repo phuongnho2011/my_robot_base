@@ -17,6 +17,11 @@ void setup()
   Wire.begin();
   delay(2000);
   mpu.setup(0x68);
+  delay(2000);
+  mpu.calibrateAccelGyro();
+  nh.loginfo("Start Calibration Megneto");
+  delay(2000);
+  mpu.calibrateMag();
 
   // setting for motors
   mt_driver.init();
@@ -312,8 +317,7 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  theta = atan2f(mpu.getQuaternionW() * mpu.getQuaternionZ() + mpu.getQuaternionX() * mpu.getQuaternionY(),
-                 0.5f - mpu.getQuaternionY() * mpu.getQuaternionY() - mpu.getQuaternionZ() * mpu.getQuaternionZ());
+  theta = mpu.getYaw()*PI/180;
   delta_theta = theta - last_theta;
 
   // compute odometric pose
