@@ -178,9 +178,28 @@ void updateTFPrefix(bool isConnected)
   {
     if (isChecked == false)
     {
-      sprintf(odom_header_frame_id, "odom");
-      sprintf(odom_child_frame_id, "base_footprint");
-      sprintf(joint_state_header_frame_id, "base_link");
+      nh.getParam("~tf_prefix", &get_tf_prefix);
+
+      if (!strcmp(get_tf_prefix, ""))
+      {
+        sprintf(odom_header_frame_id, "odom");
+        sprintf(odom_child_frame_id, "base_footprint");
+
+        sprintf(joint_state_header_frame_id, "base_link");
+      }
+      else
+      {
+        strcpy(odom_header_frame_id, get_tf_prefix);
+        strcpy(odom_child_frame_id, get_tf_prefix);
+
+        strcpy(imu_frame_id, get_tf_prefix);
+        strcpy(joint_state_header_frame_id, get_tf_prefix);
+
+        strcat(odom_header_frame_id, "/odom");
+        strcat(odom_child_frame_id, "/base_footprint");
+
+        strcat(joint_state_header_frame_id, "/base_link");
+      }
 
       sprintf(log_msg, "Setup TF on Odometry [%s]", odom_header_frame_id);
       nh.loginfo(log_msg);
@@ -317,7 +336,7 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  theta = mpu.getYaw()*PI/180;
+  theta = mpu.getYaw() * PI / 180;
   delta_theta = theta - last_theta;
 
   // compute odometric pose
