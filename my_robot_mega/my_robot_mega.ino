@@ -17,11 +17,6 @@ void setup()
   Wire.begin();
   delay(2000);
   mpu.setup(0x68);
-  delay(2000);
-  mpu.calibrateAccelGyro();
-  nh.loginfo("Start Calibration Megneto");
-  delay(2000);
-  mpu.calibrateMag();
 
   // setting for motors
   mt_driver.init();
@@ -214,6 +209,11 @@ void updateVariable(bool isConnected)
     if (variable_flag == false)
     {
       initOdom();
+      delay(2000);
+      mpu.calibrateAccelGyro();
+      nh.loginfo("Start Calibration Megneto");
+      delay(2000);
+      mpu.calibrateMag();
       variable_flag = true;
     }
   }
