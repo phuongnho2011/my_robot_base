@@ -10,9 +10,11 @@ void setup() {
 
   mpu.setup(0x68); 
 
-  delay(5000);
+  delay(3000);
 
   mpu.calibrateAccelGyro();
+  Serial.println("CalibrateMag");
+  delay(2000);	
   mpu.calibrateMag();
 
   mpu.printCalibration();
@@ -20,8 +22,8 @@ void setup() {
 
 void loop() {
   if(mpu.update()) {
- // Serial.println(atan2f(mpu.getQuaternionX() * mpu.getQuaternionW() + mpu.getQuaternionY() * mpu.getQuaternionZ(),
- //               0.5f - mpu.getQuaternionZ() * mpu.getQuaternionZ() - mpu.getQuaternionW() * mpu.getQuaternionW()));
-    Serial.println(mpu.getYaw());
+ // Serial.println(atan2f(mpu.getQuaternionW() * mpu.getQuaternionZ() + mpu.getQuaternionX() * mpu.getQuaternionY(),
+               // 0.5f - mpu.getQuaternionY() * mpu.getQuaternionY() - mpu.getQuaternionZ() * mpu.getQuaternionZ()));
+   Serial.println(mpu.getYaw());
   }
 }
