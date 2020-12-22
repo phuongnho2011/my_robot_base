@@ -42,12 +42,21 @@ void loop()
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
 
-  if (t - tTime[6] > CONTROL_MOTOR_TIMEOUT)
+  if ((t - tTime[0]) >= CONTROL_MOTOR_SPEED_FREQUENCY)
   {
-    mt_driver.setSetpointL(0);
-    mt_driver.setSetpointR(0);
-    mt_driver.setpulseL_PID(0);
-    mt_driver.setpulseR_PID(0);
+    if (t - tTime[6] > CONTROL_MOTOR_TIMEOUT)
+    {
+      mt_driver.setSetpointL(0);
+      mt_driver.setSetpointR(0);
+      mt_driver.setpulseL_PID(0);
+      mt_driver.setpulseR_PID(0);
+    }
+    else
+    {
+      mt_driver.setSetpointL((goal_velocity_from_cmd[LINEAR] - goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 3.2);
+      mt_driver.setSetpointR((goal_velocity_from_cmd[LINEAR] + goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 5);
+    }
+    tTime[0] = t;
   }
 
   if ((t - tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
@@ -231,7 +240,6 @@ void updateVariable(bool isConnected)
       delay(2000);
       mpu.calibrateAccelGyro();
       nh.loginfo("Start Calibration Megneto");
-      delay(2000);
       mpu.calibrateMag();
       variable_flag = true;
     }
@@ -296,9 +304,6 @@ void commandVelocityCallback(const geometry_msgs::Twist &cmd_vel_msg)
 {
   goal_velocity_from_cmd[LINEAR] = constrain(cmd_vel_msg.linear.x, MIN_LINEAR_VELOCITY, MAX_LINEAR_VELOCITY);
   goal_velocity_from_cmd[ANGULAR] = constrain(cmd_vel_msg.angular.z, MIN_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
-
-  mt_driver.setSetpointL((goal_velocity_from_cmd[LINEAR] - goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 3.2);
-  mt_driver.setSetpointR((goal_velocity_from_cmd[LINEAR] + goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 5);
 
   if (cmd_vel_msg.linear.x == 0 && cmd_vel_msg.angular.z == 0)
   {
