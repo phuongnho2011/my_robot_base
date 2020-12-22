@@ -435,10 +435,10 @@ private:
         roll *= 180.0f / PI;
         yaw *= 180.0f / PI;
         yaw += magnetic_declination;
-        // if (yaw >= +180.f)
-        //     yaw -= 360.f;
-        // else if (yaw < -180.f)
-        //     yaw += 360.f;
+        if (yaw >= +180.f)
+            yaw -= 360.f;
+        else if (yaw < -180.f)
+            yaw += 360.f;
 
         lin_ax = a[0] + a31;
         lin_ay = a[1] + a32;
