@@ -57,7 +57,7 @@
 #define MIN_ANGULAR_VELOCITY -2.75
 #define MAX_ANGULAR_VELOCITY 2.75
 
-#define WHEEL_RADIUS 0.033 //meter
+#define WHEEL_RADIUS 0.022 //meter
 #define WHEEL_SEPRATION 0.287 //meter
 
 /*******************************************************************************
