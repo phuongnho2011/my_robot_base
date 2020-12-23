@@ -90,8 +90,8 @@ void loop()
 void PID()
 {
   mt_driver.PID();
-  norm = mpu.readNormalizeGyro();
-  yaw = yaw + norm.ZAxis * 0.01;
+  //norm = mpu.readNormalizeGyro();
+  //yaw = yaw + norm.ZAxis * 0.01;
 }
 
 void initJointStates(void)
