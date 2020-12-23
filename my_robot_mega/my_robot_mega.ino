@@ -78,12 +78,11 @@ void loop()
     tTime[2] = t;
   }
 
-  if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
-  {
-    norm = mpu.readNormalizeGyro();
-    yaw = yaw + norm.ZAxis * (t - tTime[3]);
-    tTime[3] = t;
-  }
+  // if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
+  // {
+    
+  //   tTime[3] = t;
+  // }
 
   nh.spinOnce();
   waitForSerialLink(nh.connected());
@@ -167,9 +166,13 @@ void publishDriveInformation(void)
 {
   unsigned long time_now = millis();
   unsigned long step_time = time_now - prev_update_time;
+  char log_msg2[50];
 
   prev_update_time = time_now;
   ros::Time stamp_now = rosNow();
+
+  sprintf(log_msg2, "Setup TF on Odometry [%i]", long int(step_time));
+  nh.loginfo(log_msg2);
 
   calcOdometry((double)step_time * 0.001);
 
@@ -330,7 +333,6 @@ void commandVelocityCallback(const geometry_msgs::Twist &cmd_vel_msg)
 
 bool calcOdometry(double diff_time)
 {
-  // char log_msg2[50];
   double wheel_l, wheel_r; // rotation value of wheel [rad]
   double delta_s, theta, delta_theta;
   static double last_theta = 0.0;
@@ -356,8 +358,8 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  // sprintf(log_msg2, "Setup TF on Odometry [%i]", int(yaw));
-  // nh.loginfo(log_msg2);
+  norm = mpu.readNormalizeGyro();
+  yaw = yaw + norm.ZAxis * step_time;
   theta = yaw * PI / 180;
   delta_theta = theta - last_theta;
 
