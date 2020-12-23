@@ -3,7 +3,6 @@
 #include <my_motor_driver.h>
 #include <my_robot_core_config.h>
 #include <TimerOne.h>
-#include <TimerTwo.h>
 
 float yaw = 0;
 Vector norm;
@@ -23,7 +22,8 @@ void setup()
 
   //setting for imu
   // Initialize MPU6050
-  while (!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G));
+  while (!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
+    ;
 
   // Calibrate gyroscope. The calibration must be at rest.
   // If you don't want calibrate, comment this line.
@@ -40,9 +40,6 @@ void setup()
 
   Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
-
-  Timer2.init(20000u, IMU);
-  Timer2.start();
 
   prev_update_time = millis();
 }
@@ -81,12 +78,13 @@ void loop()
     tTime[2] = t;
   }
 
-  // if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
-  // {
-  //   //mpu.update();
-  //   tTime[3] = t;
-  // }
-  
+  if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
+  {
+    norm = mpu.readNormalizeGyro();
+    yaw = yaw + norm.ZAxis * (t - tTime[3]);
+    tTime[3] = t;
+  }
+
   nh.spinOnce();
   waitForSerialLink(nh.connected());
 }
@@ -94,12 +92,6 @@ void loop()
 void PID()
 {
   mt_driver.PID();
-}
-
-void IMU()
-{
-  norm = mpu.readNormalizeGyro();
-  yaw = yaw + norm.ZAxis * 0.02;
 }
 
 void initJointStates(void)
