@@ -166,13 +166,13 @@ void publishDriveInformation(void)
 {
   unsigned long time_now = millis();
   unsigned long step_time = time_now - prev_update_time;
-  char log_msg2[50];
+  // char log_msg2[50];
 
   prev_update_time = time_now;
   ros::Time stamp_now = rosNow();
 
-  sprintf(log_msg2, "Setup TF on Odometry [%i]", int(step_time));
-  nh.loginfo(log_msg2);
+  // sprintf(log_msg2, "Setup TF on Odometry [%i]", int(step_time));
+  // nh.loginfo(log_msg2);
 
   calcOdometry((double)step_time * 0.001);
 
