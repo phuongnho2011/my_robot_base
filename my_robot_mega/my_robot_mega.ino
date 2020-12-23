@@ -5,6 +5,7 @@
 #include <TimerOne.h>
 
 float yaw = 0;
+Vector norm;
 
 void setup()
 {
@@ -21,12 +22,12 @@ void setup()
 
   //setting for imu
   // Initialize MPU6050
-  while(!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
+  while (!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
   {
     Serial.println("Could not find a valid MPU6050 sensor, check wiring!");
     delay(500);
   }
-  
+
   // Calibrate gyroscope. The calibration must be at rest.
   // If you don't want calibrate, comment this line.
   mpu.calibrateGyro();
@@ -82,7 +83,7 @@ void loop()
 
   // if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
   // {
-  //   mpu.update();
+  //   //mpu.update();
   //   tTime[3] = t;
   // }
   nh.spinOnce();
@@ -93,9 +94,6 @@ void PID()
 {
   long timer = millis();
   mt_driver.PID();
-  Vector norm = mpu.readNormalizeGyro();
-  // Calculate Pitch, Roll and Yaw
-  yaw = yaw + norm.ZAxis * 0.01;
 }
 
 void initJointStates(void)
@@ -359,6 +357,8 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
+  norm = mpu.readNormalizeGyro();
+  yaw = yaw + norm.ZAxis * (step_time);
   theta = yaw * PI / 180;
   delta_theta = theta - last_theta;
 
