@@ -41,7 +41,7 @@ void setup()
   Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
 
-  Timer2.init(10000u, IMU);
+  Timer2.init(1000u, IMU);
   Timer2.start();
 
   prev_update_time = millis();
@@ -81,11 +81,11 @@ void loop()
     tTime[2] = t;
   }
 
-  if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
-  {
-    //mpu.update();
-    //tTime[3] = t;
-  }
+  // if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
+  // {
+  //   //mpu.update();
+  //   tTime[3] = t;
+  // }
   
   nh.spinOnce();
   waitForSerialLink(nh.connected());
@@ -98,8 +98,8 @@ void PID()
 
 void IMU()
 {
-  //norm = mpu.readNormalizeGyro();
-  //yaw = yaw + norm.ZAxis * 0.01;
+  norm = mpu.readNormalizeGyro();
+  yaw = yaw + norm.ZAxis * 0.01;
 }
 
 void initJointStates(void)
