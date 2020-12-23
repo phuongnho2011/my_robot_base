@@ -158,7 +158,9 @@ float goal_velocity_from_button[WHEEL_NUM] = {0.0, 0.0};
 float goal_velocity_from_cmd[WHEEL_NUM] = {0.0, 0.0};
 float goal_velocity_from_rc100[WHEEL_NUM] = {0.0, 0.0};
 
-MPU9250 mpu;
+//MPU9250 mpu;
+
+MPU6050 mpu;
 
 motor_driver mt_driver;
 

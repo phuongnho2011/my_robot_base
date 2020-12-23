@@ -29,6 +29,21 @@ void setup()
   Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
 
+  // Initialize MPU6050
+  while(!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
+  {
+    Serial.println("Could not find a valid MPU6050 sensor, check wiring!");
+    delay(500);
+  }
+  
+  // Calibrate gyroscope. The calibration must be at rest.
+  // If you don't want calibrate, comment this line.
+  mpu.calibrateGyro();
+
+  // Set threshold sensivty. Default 3.
+  // If you don't want use threshold, comment this line or set 0.
+  mpu.setThreshold(3);
+
   prev_update_time = millis();
 }
 
@@ -66,18 +81,23 @@ void loop()
     tTime[2] = t;
   }
 
-  if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
-  {
-    mpu.update();
-    tTime[3] = t;
-  }
+  // if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
+  // {
+  //   mpu.update();
+  //   tTime[3] = t;
+  // }
   nh.spinOnce();
   waitForSerialLink(nh.connected());
 }
 
 void PID()
 {
+  long timer = millis();
   mt_driver.PID();
+  Vector norm = mpu.readNormalizeGyro();
+  // Calculate Pitch, Roll and Yaw
+  yaw = yaw + norm.ZAxis * 0.01;
+  delay((0.01*1000) - (millis() - timer));
 }
 
 void initJointStates(void)

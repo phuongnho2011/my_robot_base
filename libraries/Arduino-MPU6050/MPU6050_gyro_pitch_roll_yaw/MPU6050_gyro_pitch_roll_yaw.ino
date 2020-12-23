@@ -1,3 +1,11 @@
+/*
+    MPU6050 Triple Axis Gyroscope & Accelerometer. Pitch & Roll & Yaw Gyroscope Example.
+    Read more: http://www.jarzebski.pl/arduino/czujniki-i-sensory/3-osiowy-zyroskop-i-akcelerometr-mpu6050.html
+    GIT: https://github.com/jarzebski/Arduino-MPU6050
+    Web: http://www.jarzebski.pl
+    (c) 2014 by Korneliusz Jarzebski
+*/
+
 #include <Wire.h>
 #include <MPU6050.h>
 
@@ -30,7 +38,6 @@ void setup()
   // Set threshold sensivty. Default 3.
   // If you don't want use threshold, comment this line or set 0.
   mpu.setThreshold(3);
-  
 }
 
 void loop()
