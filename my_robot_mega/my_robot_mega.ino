@@ -96,7 +96,6 @@ void PID()
   Vector norm = mpu.readNormalizeGyro();
   // Calculate Pitch, Roll and Yaw
   yaw = yaw + norm.ZAxis * 0.01;
-  delay((0.01*1000) - (millis() - timer));
 }
 
 void initJointStates(void)
