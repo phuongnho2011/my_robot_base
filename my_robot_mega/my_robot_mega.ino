@@ -1,4 +1,5 @@
-#include <MPU9250.h>
+#include <Wire.h>
+#include <MPU6050.h>
 #include <my_motor_driver.h>
 #include <my_robot_core_config.h>
 #include <TimerOne.h>
