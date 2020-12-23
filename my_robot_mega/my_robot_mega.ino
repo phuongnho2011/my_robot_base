@@ -41,7 +41,7 @@ void setup()
   Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
 
-  Timer2.init(10u, IMU);
+  Timer2.init(20000u, IMU);
   Timer2.start();
 
   prev_update_time = millis();
@@ -99,7 +99,7 @@ void PID()
 void IMU()
 {
   norm = mpu.readNormalizeGyro();
-  yaw = yaw + norm.ZAxis * 0.01;
+  yaw = yaw + norm.ZAxis * 0.02;
 }
 
 void initJointStates(void)
