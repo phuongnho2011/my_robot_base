@@ -327,6 +327,7 @@ void commandVelocityCallback(const geometry_msgs::Twist &cmd_vel_msg)
 
 bool calcOdometry(double diff_time)
 {
+  char log_msg2[50];
   double wheel_l, wheel_r; // rotation value of wheel [rad]
   double delta_s, theta, delta_theta;
   static double last_theta = 0.0;
@@ -354,6 +355,8 @@ bool calcOdometry(double diff_time)
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
   norm = mpu.readNormalizeGyro();
   yaw = yaw + norm.ZAxis * (step_time);
+  sprintf(log_msg2, "Setup TF on Odometry [%i]", int(yaw));
+  nh.loginfo(log_msg2);
   theta = yaw * PI / 180;
   delta_theta = theta - last_theta;
 
