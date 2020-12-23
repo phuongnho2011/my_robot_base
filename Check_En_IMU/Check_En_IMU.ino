@@ -15,9 +15,10 @@ void setup() {
   mpu.calibrateAccelGyro();
   Serial.println("CalibrateMag");
   delay(2000);	
+  mpu.setMagneticDeclination(-1.43);
   mpu.calibrateMag();
-
   mpu.printCalibration();
+  
 }
 
 void loop() {
