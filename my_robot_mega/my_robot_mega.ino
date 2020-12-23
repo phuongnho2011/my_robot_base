@@ -22,7 +22,8 @@ void setup()
 
   //setting for imu
   // Initialize MPU6050
-  while (!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G));
+  mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G
+  
 
   // Calibrate gyroscope. The calibration must be at rest.
   // If you don't want calibrate, comment this line.
