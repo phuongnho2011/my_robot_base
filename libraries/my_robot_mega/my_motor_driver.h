@@ -2,6 +2,7 @@
 #define my_motor_driver_h
 
 #include <Arduino.h>
+#include <ros.h>
 
 #define EN_L 4
 #define EN_R 5
@@ -24,6 +25,9 @@
 #define LIN 0
 #define RAD 1
 
+#define LPF_heso 0.08
+
+
 class motor_driver
 {
     public:
@@ -31,21 +35,37 @@ class motor_driver
         void init(void);
         void motor_Right(int);
         void motor_Left(int);
-        void cal_Velocity(void);
-        void control_Motor(const float wheel_rad, const float wheel_sep,float* cmd_value);
+        void control_Motor(const float wheel_rad, const float wheel_sep,float* cmd_value,double time);
         void read_EncoderL();
         static void cal_encoderL();
         void read_EncoderR();
         static void cal_encoderR();
         int32_t getLeftencoder();
         int32_t getRightencoder();
+        void PID();
+	    double getSpeedL();
+        double getSpeedR();
+	    void setSetpointL(float);
+	    void setSetpointR(float);
+        void setpulseR_PID(float);
+        void setpulseL_PID(float);
     private:
-        unsigned int lastTime;
-        float rpm;
         int32_t pulsesL, pulsesR;
-        unsigned long previousTime = 0;
-        unsigned long Time;   
-        float velocity;
+        //PID
+	    double T;
+        
+        double pulseR_PID;
+        double speedR, setpointR, pre_speedR;
+        double E1_R, E1_1_R, E1_2_R;
+        double alphaR, betaR, gamaR, KpR, KiR, KdR;
+        double OutputR, LastOutputR;
+
+        double pulseL_PID;
+        double speedL, setpointL, pre_speedL;
+        double E1_L, E1_1_L, E1_2_L;
+        double alphaL, betaL, gamaL, KpL ,KiL ,KdL;
+        double OutputL, LastOutputL;
+
 };
 
 #endif 
