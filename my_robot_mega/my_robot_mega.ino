@@ -41,7 +41,7 @@ void setup()
   Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
 
-  Timer2.init(1000u, IMU);
+  Timer2.init(10u, IMU);
   Timer2.start();
 
   prev_update_time = millis();
