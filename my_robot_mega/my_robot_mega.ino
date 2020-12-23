@@ -54,7 +54,14 @@ void loop()
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
 
-  if ((t - tTime[0]) >= CONTROL_MOTOR_SPEED_FREQUENCY)
+  if ((t - tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
+  {
+    updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
+    publishDriveInformation();
+    tTime[2] = t;
+  }
+
+  if ((t - tTime[0]) >= (1000/CONTROL_MOTOR_SPEED_FREQUENCY))
   {
     if (t - tTime[6] > CONTROL_MOTOR_TIMEOUT)
     {
@@ -69,13 +76,6 @@ void loop()
       mt_driver.setSetpointR((goal_velocity_from_cmd[LINEAR] + goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 5);
     }
     tTime[0] = t;
-  }
-
-  if ((t - tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
-  {
-    updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
-    publishDriveInformation();
-    tTime[2] = t;
   }
 
   // if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
