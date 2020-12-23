@@ -4,6 +4,8 @@
 #include <my_robot_core_config.h>
 #include <TimerOne.h>
 
+float yaw = 0;
+
 void setup()
 {
   // Initialize ROS node handle, advertise and subscribe the topics
@@ -14,22 +16,10 @@ void setup()
   nh.advertise(joint_states_pub);
   tf_broadcaster.init(nh);
 
-  // setting for imu
-  Wire.begin();
-  delay(2000);
-  mpu.setup(0x68);
-
   // setting for motors
   mt_driver.init();
 
-  // setting for slam and navigation (odometry, joint states, TF)
-  initOdom();
-
-  initJointStates();
-
-  Timer1.initialize(10000);
-  Timer1.attachInterrupt(PID);
-
+  //setting for imu
   // Initialize MPU6050
   while(!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
   {
@@ -44,6 +34,14 @@ void setup()
   // Set threshold sensivty. Default 3.
   // If you don't want use threshold, comment this line or set 0.
   mpu.setThreshold(3);
+
+  // setting for slam and navigation (odometry, joint states, TF)
+  initOdom();
+
+  initJointStates();
+
+  Timer1.initialize(10000);
+  Timer1.attachInterrupt(PID);
 
   prev_update_time = millis();
 }
@@ -258,10 +256,10 @@ void updateVariable(bool isConnected)
     if (variable_flag == false)
     {
       initOdom();
-      delay(2000);
-      mpu.calibrateAccelGyro();
-      nh.loginfo("Start Calibration Megneto");
-      mpu.calibrateMag();
+      // delay(2000);
+      // mpu.calibrateAccelGyro();
+      // nh.loginfo("Start Calibration Megneto");
+      // mpu.calibrateMag();
       variable_flag = true;
     }
   }
@@ -362,7 +360,7 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  theta = mpu.getYaw() * PI / 180;
+  theta = yaw * PI / 180;
   delta_theta = theta - last_theta;
 
   // compute odometric pose
