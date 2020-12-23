@@ -82,6 +82,7 @@ void loop()
   //   //mpu.update();
   //   tTime[3] = t;
   // }
+
   nh.spinOnce();
   waitForSerialLink(nh.connected());
 }
@@ -89,6 +90,8 @@ void loop()
 void PID()
 {
   mt_driver.PID();
+  norm = mpu.readNormalizeGyro();
+  yaw = yaw + norm.ZAxis * 0.01;
 }
 
 void initJointStates(void)
@@ -353,8 +356,6 @@ bool calcOdometry(double diff_time)
     wheel_r = 0.0;
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
-  norm = mpu.readNormalizeGyro();
-  yaw = yaw + norm.ZAxis * (step_time);
   // sprintf(log_msg2, "Setup TF on Odometry [%i]", int(yaw));
   // nh.loginfo(log_msg2);
   theta = yaw * PI / 180;
