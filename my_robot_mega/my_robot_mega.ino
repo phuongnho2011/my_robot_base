@@ -3,6 +3,7 @@
 #include <my_motor_driver.h>
 #include <my_robot_core_config.h>
 #include <TimerOne.h>
+#include <TimerTwo.h>
 
 float yaw = 0;
 Vector norm;
@@ -39,6 +40,9 @@ void setup()
 
   Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
+
+  Timer2.init(10000u, IMU);
+  Timer2.start();
 
   prev_update_time = millis();
 }
@@ -82,7 +86,7 @@ void loop()
   //   //mpu.update();
   //   tTime[3] = t;
   // }
-
+  
   nh.spinOnce();
   waitForSerialLink(nh.connected());
 }
@@ -90,8 +94,12 @@ void loop()
 void PID()
 {
   mt_driver.PID();
-  //norm = mpu.readNormalizeGyro();
-  //yaw = yaw + norm.ZAxis * 0.01;
+}
+
+void IMU()
+{
+  norm = mpu.readNormalizeGyro();
+  yaw = yaw + norm.ZAxis * 0.01;
 }
 
 void initJointStates(void)
