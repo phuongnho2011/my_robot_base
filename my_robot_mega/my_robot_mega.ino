@@ -171,7 +171,7 @@ void publishDriveInformation(void)
   prev_update_time = time_now;
   ros::Time stamp_now = rosNow();
 
-  sprintf(log_msg2, "Setup TF on Odometry [%i]", long int(step_time));
+  sprintf(log_msg2, "Setup TF on Odometry [%i]", int(step_time));
   nh.loginfo(log_msg2);
 
   calcOdometry((double)step_time * 0.001);
