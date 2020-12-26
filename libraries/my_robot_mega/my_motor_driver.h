@@ -7,11 +7,11 @@
 #define EN_L 4
 #define EN_R 5
 
-#define INT1_L 23
-#define INT2_L 25
+#define INT1_L 25
+#define INT2_L 23
 
-#define INT1_R 27
-#define INT2_R 29
+#define INT1_R 29
+#define INT2_R 27
 
 #define A1 2
 #define B1 39

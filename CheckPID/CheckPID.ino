@@ -8,8 +8,8 @@ void setup()
 {
   motor.init();
   delay(1000);
-  //motor.setSetpointR(10); //cong them 5 vong
-  //motor.setSetpointL(50); // cong them 3.2
+  motor.setSetpointR(-10); //cong them 5 vong
+  motor.setSetpointL(10); // cong them 3.2
   Serial.begin(9600);
   Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
@@ -17,8 +17,8 @@ void setup()
 
 void loop()
 { 
-  //Serial.println(motor.getSpeedR());
-  Serial.println(motor.getRightencoder());
+  Serial.println(motor.getSpeedR());
+  //Serial.println(motor.getLeftencoder());
 }
 
 void motor_driver::cal_encoderL()
