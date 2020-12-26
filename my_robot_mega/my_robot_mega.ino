@@ -72,8 +72,8 @@ void loop()
     }
     else
     {
-      mt_driver.setSetpointL((goal_velocity_from_cmd[LINEAR] - goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 3.2);
-      mt_driver.setSetpointR((goal_velocity_from_cmd[LINEAR] + goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 5);
+      mt_driver.setSetpointL((goal_velocity_from_cmd[LINEAR] - goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60);
+      mt_driver.setSetpointR((goal_velocity_from_cmd[LINEAR] + goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60);
     }
     tTime[0] = t;
   }
