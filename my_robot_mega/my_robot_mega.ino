@@ -4,9 +4,6 @@
 #include <my_robot_core_config.h>
 #include <TimerOne.h>
 
-float yaw = 0;
-Vector norm;
-
 void setup()
 {
   // Initialize ROS node handle, advertise and subscribe the topics
@@ -22,8 +19,7 @@ void setup()
 
   //setting for imu
   // Initialize MPU6050
-  while (!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
-    ;
+  while (!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G));
 
   // Calibrate gyroscope. The calibration must be at rest.
   // If you don't want calibrate, comment this line.
@@ -77,12 +73,6 @@ void loop()
     }
     tTime[0] = t;
   }
-
-  // if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
-  // {
-    
-  //   tTime[3] = t;
-  // }
 
   nh.spinOnce();
   waitForSerialLink(nh.connected());
@@ -254,10 +244,6 @@ void updateVariable(bool isConnected)
     if (variable_flag == false)
     {
       initOdom();
-      // delay(2000);
-      // mpu.calibrateAccelGyro();
-      // nh.loginfo("Start Calibration Megneto");
-      // mpu.calibrateMag();
       variable_flag = true;
     }
   }
@@ -284,7 +270,7 @@ void updateJointStates(void)
 
 void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
 {
-  int32_t current_pulse = 0;
+  //int32_t current_pulse = 0;
   static int32_t last_pulse[WHEEL_NUM] = {0, 0};
 
   if (init_encoder)
@@ -304,16 +290,16 @@ void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
     return;
   }
 
-  current_pulse = left_pulse;
+  //current_pulse = left_pulse;
 
-  last_diff_pulse[LEFT] = current_pulse - last_pulse[LEFT];
-  last_pulse[LEFT] = current_pulse;
+  last_diff_pulse[LEFT] = left_pulse - last_pulse[LEFT];
+  last_pulse[LEFT] = left_pulse;
   last_rad[LEFT] += PULSE2RADL * (double)last_diff_pulse[LEFT];
 
-  current_pulse = right_pulse;
+  //current_pulse = right_pulse;
 
-  last_diff_pulse[RIGHT] = current_pulse - last_pulse[RIGHT];
-  last_pulse[RIGHT] = current_pulse;
+  last_diff_pulse[RIGHT] = right_pulse - last_pulse[RIGHT];
+  last_pulse[RIGHT] = right_pulse;
   last_rad[RIGHT] += PULSE2RADR * (double)last_diff_pulse[RIGHT];
 }
 
@@ -333,6 +319,8 @@ void commandVelocityCallback(const geometry_msgs::Twist &cmd_vel_msg)
 
 bool calcOdometry(double diff_time)
 {
+  float yaw = 0;
+  Vector norm;
   double wheel_l, wheel_r; // rotation value of wheel [rad]
   double delta_s, theta, delta_theta;
   static double last_theta = 0.0;
