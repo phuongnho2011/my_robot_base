@@ -19,7 +19,8 @@ void setup()
 
   //setting for imu
   // Initialize MPU6050
-  while (!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G));
+  while (!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
+    ;
 
   // Calibrate gyroscope. The calibration must be at rest.
   // If you don't want calibrate, comment this line.
@@ -57,7 +58,7 @@ void loop()
     tTime[2] = t;
   }
 
-  if ((t - tTime[0]) >= (1000/CONTROL_MOTOR_SPEED_FREQUENCY))
+  if ((t - tTime[0]) >= (1000 / CONTROL_MOTOR_SPEED_FREQUENCY))
   {
     if (t - tTime[6] > CONTROL_MOTOR_TIMEOUT)
     {
@@ -68,8 +69,12 @@ void loop()
     }
     else
     {
-      mt_driver.setSetpointL((goal_velocity_from_cmd[LINEAR] - goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60);
-      mt_driver.setSetpointR((goal_velocity_from_cmd[LINEAR] + goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60);
+      //mt_driver.setSetpointL((goal_velocity_from_cmd[LINEAR] - goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60);
+      //mt_driver.setSetpointR((goal_velocity_from_cmd[LINEAR] + goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60);
+      mt_driver.setSetpointFL((1 / WHEEL_RADIUS) * (goal_velocity_from_cmd[LINEARX] - goal_velocity_from_cmd[LINEARY] - (WHEEL_SEPARATION_WIDTH + WHEEL_SEPARATION_LENGTH) * goal_velocity_from_cmd[ANGULAR]) * radtorpm); //Tar_wheel_front_left값 계산 수식
+      mt_driver.setSetpointFR((1 / WHEEL_RADIUS) * (goal_velocity_from_cmd[LINEARX] + goal_velocity_from_cmd[LINEARY] + (WHEEL_SEPARATION_WIDTH + WHEEL_SEPARATION_LENGTH) * goal_velocity_from_cmd[ANGULAR]) * radtorpm); //Tar_wheel_front_right값 계산 수식
+      mt_driver.setSetpointBL((1 / WHEEL_RADIUS) * (goal_velocity_from_cmd[LINEARX] + goal_velocity_from_cmd[LINEARY] - (WHEEL_SEPARATION_WIDTH + WHEEL_SEPARATION_LENGTH) * goal_velocity_from_cmd[ANGULAR]) * radtorpm); //Tar_wheel_rear_left값 계산 수식
+      mt_driver.setSetpointBR((1 / WHEEL_RADIUS) * (goal_velocity_from_cmd[LINEARX] - goal_velocity_from_cmd[LINEARY] + (WHEEL_SEPARATION_WIDTH + WHEEL_SEPARATION_LENGTH) * goal_velocity_from_cmd[ANGULAR]) * radtorpm); //Tar_wheel_rear_right값 계산 수식
     }
     tTime[0] = t;
   }
@@ -85,7 +90,7 @@ void PID()
 
 void initJointStates(void)
 {
-  static char *joint_states_name[] = {(char *)"wheel_left_joint", (char *)"wheel_right_joint"};
+  static char *joint_states_name[] = {(char *)"wheel_fleft_joint", (char *)"wheel_fright_joint", (char *)"wheel_bleft_joint", (char *)"wheel_bright_joint"};
 
   joint_states.header.frame_id = joint_state_header_frame_id;
   joint_states.name = joint_states_name;
@@ -119,6 +124,7 @@ void initOdom(void)
   odom.pose.pose.orientation.w = 0.0;
 
   odom.twist.twist.linear.x = 0.0;
+  odom.twist.twist.linear.y = 0.0;
   odom.twist.twist.angular.z = 0.0;
 }
 
@@ -139,6 +145,7 @@ void updateOdometry(void)
   odom.pose.pose.orientation = tf::createQuaternionFromYaw(odom_pose[2]);
 
   odom.twist.twist.linear.x = odom_vel[0];
+  odom.twist.twist.linear.y = odom_vel[1];
   odom.twist.twist.angular.z = odom_vel[2];
 }
 
@@ -255,23 +262,27 @@ void updateVariable(bool isConnected)
 
 void updateJointStates(void)
 {
-  static float joint_states_pos[WHEEL_NUM] = {0.0, 0.0};
-  static float joint_states_vel[WHEEL_NUM] = {0.0, 0.0};
+  static float joint_states_pos[WHEEL_NUM] = {0.0, 0.0, 0.0, 0.0};
+  static float joint_states_vel[WHEEL_NUM] = {0.0, 0.0, 0.0, 0.0};
 
-  joint_states_pos[LEFT] = PULSE2RADL * (double)mt_driver.getLeftencoder();
-  joint_states_pos[RIGHT] = PULSE2RADR * (double)mt_driver.getRightencoder();
+  joint_states_pos[FLEFT] = PULSE2RAD * (double)mt_driver.getFLencoder();
+  joint_states_pos[FRIGHT] = PULSE2RAD * (double)mt_driver.getFRencoder();
+  joint_states_pos[BLEFT] = PULSE2RAD * (double)mt_driver.getBLencoder();
+  joint_states_pos[BRIGHT] = PULSE2RAD * (double)mt_driver.getBRencoder();
 
-  joint_states_vel[LEFT] = last_velocity[LEFT];
-  joint_states_vel[RIGHT] = last_velocity[RIGHT];
+  joint_states_vel[FLEFT] = last_velocity[FLEFT];
+  joint_states_vel[FRIGHT] = last_velocity[FRIGHT];
+  joint_states_vel[BLEFT] = last_velocity[BLEFT];
+  joint_states_vel[BRIGHT] = last_velocity[BRIGHT];
 
   joint_states.position = joint_states_pos;
   joint_states.velocity = joint_states_vel;
 }
 
-void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
+void updateMotorInfo(int32_t fleft_pulse, int32_t fright_pulse, int32_t bleft_pulse, int32_t bright_pulse)
 {
   //int32_t current_pulse = 0;
-  static int32_t last_pulse[WHEEL_NUM] = {0, 0};
+  static int32_t last_pulse[WHEEL_NUM] = {0, 0, 0, 0};
 
   if (init_encoder)
   {
@@ -280,38 +291,46 @@ void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
       last_diff_pulse[index] = 0;
       last_pulse[index] = 0;
       last_rad[index] = 0.0;
-
       last_velocity[index] = 0.0;
     }
 
-    last_pulse[LEFT] = left_pulse;
-    last_pulse[RIGHT] = right_pulse;
+    last_pulse[FLEFT] = fleft_pulse;
+    last_pulse[FRIGHT] = fright_pulse;
+    last_pulse[BLEFT] = bleft_pulse;
+    last_pulse[BRIGHT] = bright_pulse;
     init_encoder = false;
     return;
   }
 
-  //current_pulse = left_pulse;
+  last_diff_pulse[FLEFT] = fleft_pulse - last_pulse[FLEFT];
+  last_pulse[FLEFT] = fleft_pulse;
+  last_radF[FLEFT] += PULSE2RAD * (double)last_diff_pulse[FLEFT];
 
-  last_diff_pulse[LEFT] = left_pulse - last_pulse[LEFT];
-  last_pulse[LEFT] = left_pulse;
-  last_rad[LEFT] += PULSE2RADL * (double)last_diff_pulse[LEFT];
+  last_diff_pulse[FRIGHT] = fright_pulse - last_pulse[FRIGHT];
+  last_pulse[FRIGHT] = fright_pulse;
+  last_rad[FRIGHT] += PULSE2RAD * (double)last_diff_pulse[FRIGHT];
 
-  //current_pulse = right_pulse;
+  last_diff_pulse[BLEFT] = bleft_pulse - last_pulse[BLEFT];
+  last_pulse[BLEFT] = bleft_pulse;
+  last_radF[BLEFT] += PULSE2RAD * (double)last_diff_pulse[BLEFT];
 
-  last_diff_pulse[RIGHT] = right_pulse - last_pulse[RIGHT];
-  last_pulse[RIGHT] = right_pulse;
-  last_rad[RIGHT] += PULSE2RADR * (double)last_diff_pulse[RIGHT];
+  last_diff_pulse[BRIGHT] = bright_pulse - last_pulse[BRIGHT];
+  last_pulse[BRIGHT] = bright_pulse;
+  last_rad[BRIGHT] += PULSE2RAD * (double)last_diff_pulse[BRIGHT];
 }
 
 void commandVelocityCallback(const geometry_msgs::Twist &cmd_vel_msg)
 {
-  goal_velocity_from_cmd[LINEAR] = constrain(cmd_vel_msg.linear.x, MIN_LINEAR_VELOCITY, MAX_LINEAR_VELOCITY);
+  goal_velocity_from_cmd[LINEARX] = constrain(cmd_vel_msg.linear.x, MIN_LINEAR_VELOCITYX, MAX_LINEAR_VELOCITYX);
+  goal_velocity_from_cmd[LINEARY] = constrain(cmd_vel_msg.linear.y, MIN_LINEAR_VELOCITYY, MAX_LINEAR_VELOCITYY);
   goal_velocity_from_cmd[ANGULAR] = constrain(cmd_vel_msg.angular.z, MIN_ANGULAR_VELOCITY, MAX_ANGULAR_VELOCITY);
 
-  if (cmd_vel_msg.linear.x == 0 && cmd_vel_msg.angular.z == 0)
+  if (cmd_vel_msg.linear.x == 0 && cmd_vel_msg.angular.z == 0 && cmd_vel_msg.linear.y == 0)
   {
-    mt_driver.setpulseL_PID(0);
-    mt_driver.setpulseR_PID(0);
+    mt_driver.setpulseFL_PID(0);
+    mt_driver.setpulseFR_PID(0);
+    mt_driver.setpulseBL_PID(0);
+    mt_driver.setpulseBR_PID(0);
   }
 
   tTime[6] = millis();
@@ -322,22 +341,24 @@ bool calcOdometry(double diff_time)
   float yaw = 0;
   Vector norm;
   double wheel_l, wheel_r; // rotation value of wheel [rad]
-  double delta_s, theta, delta_theta;
+  double delta_x, delta_y, theta, delta_theta;
   static double last_theta = 0.0;
-  double v, w; // v = translational velocity [m/s], w = rotational velocity [rad/s]
+  double vx, vy, w; // v = translational velocity [m/s], w = rotational velocity [rad/s]
   double step_time;
 
-  wheel_l = wheel_r = 0.0;
-  delta_s = delta_theta = theta = 0.0;
-  v = w = 0.0;
+  wheel_fl = wheel_fr = wheel_bl = wheel_br = 0.0;
+  delta_x = delta_y = delta_theta = theta = 0.0;
+  vx = vy = w = 0.0;
   step_time = 0;
   step_time = diff_time;
 
   if (step_time == 0)
     return false;
 
-  wheel_l = PULSE2RADL * (double)last_diff_pulse[LEFT];
-  wheel_r = PULSE2RADR * (double)last_diff_pulse[RIGHT];
+  wheel_fl = PULSE2RADFL * (double)last_diff_pulse[FLEFT];
+  wheel_fr = PULSE2RADFR * (double)last_diff_pulse[FRIGHT];
+  wheel_bl = PULSE2RADBL * (double)last_diff_pulse[FLEFT];
+  wheel_br = PULSE2RADBR * (double)last_diff_pulse[FRIGHT];
 
   if (isnan(wheel_l))
     wheel_l = 0.0;
@@ -345,28 +366,33 @@ bool calcOdometry(double diff_time)
   if (isnan(wheel_r))
     wheel_r = 0.0;
 
-  delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
   norm = mpu.readNormalizeGyro();
   yaw = yaw + norm.ZAxis * step_time;
   theta = yaw * PI / 180;
   delta_theta = theta - last_theta;
 
-  // compute odometric pose
-  odom_pose[0] += delta_s * cos(odom_pose[2] + (delta_theta / 2.0));
-  odom_pose[1] += delta_s * sin(odom_pose[2] + (delta_theta / 2.0));
+  w = delta_theta / step_time;
+  //vx = goal_velocity_from_cmd[LINEARX];
+  //vy = goal_velocity_from_cmd[ANGULAR];
+  vx = (mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() + mt_driver.getSpeedBR())*(WHEEL_RADIUS/4);
+  vy = (- mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() - mt_driver.getSpeedBR())*(WHEEL_RADIUS/4);
+
+  double delta_x = (vx * cos(w) - vy * sin(w)) * step_time;
+  double delta_y = (vx * sin(w) + vy * cos(w)) * step_time;
+  double delta_th = vth * step_time;
+
+  odom_pose[0] += delta_x;
+  odom_pose[1] += delta_y;
   odom_pose[2] += delta_theta;
 
-  // compute odometric instantaneouse velocity
-
-  v = delta_s / step_time;
-  w = delta_theta / step_time;
-
-  odom_vel[0] = v;
-  odom_vel[1] = 0.0;
+  odom_vel[0] = vx;
+  odom_vel[1] = vy;
   odom_vel[2] = w;
 
-  last_velocity[LEFT] = wheel_l / step_time;
-  last_velocity[RIGHT] = wheel_r / step_time;
+  last_velocity[FLEFT] = wheel_fl / step_time;
+  last_velocity[FRIGHT] = wheel_fr / step_time;
+  last_velocity[BLEFT] = wheel_bl / step_time;
+  last_velocity[BRIGHT] = wheel_br / step_time;
   last_theta = theta;
 
   return true;

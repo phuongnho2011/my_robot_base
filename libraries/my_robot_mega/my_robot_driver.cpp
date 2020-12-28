@@ -6,34 +6,55 @@ motor_driver::motor_driver()
 
 void motor_driver::init()
 {
-    pinMode(A1, INPUT_PULLUP); //chan ngat encoder
-    pinMode(B1, INPUT_PULLUP); //chan doc encoder
-    pinMode(A2, INPUT_PULLUP); //chan ngat encoder
-    pinMode(B2, INPUT_PULLUP); //chan doc encoder
+    pinMode(INTERRUPT_FL_1, INPUT_PULLUP); //chan ngat encoder
+    pinMode(INTERRUPT_FL_2, INPUT_PULLUP); //chan doc encoder
+    pinMode(INTERRUPT_FR_1, INPUT_PULLUP); //chan ngat encoder
+    pinMode(INTERRUPT_FR_2, INPUT_PULLUP); //chan doc encoder
+    pinMode(INTERRUPT_BL_1, INPUT_PULLUP); //chan ngat encoder
+    pinMode(INTERRUPT_BL_2, INPUT_PULLUP); //chan doc encoder
+    pinMode(INTERRUPT_BR_1, INPUT_PULLUP); //chan ngat encoder
+    pinMode(INTERRUPT_BR_2, INPUT_PULLUP); //chan doc encoder
 
-    pinMode(EN_R, OUTPUT);   //chan pwm
-    pinMode(INT1_R, OUTPUT); //chan DIR1
-    pinMode(INT2_R, OUTPUT); //chan DIR2
+    pinMode(PWM_FL, OUTPUT);
+    pinMode(I0_FL_1, OUTPUT);
+    pinMode(I0_FL_2, OUTPUT);
 
-    pinMode(EN_L, OUTPUT);   //chan pwm
-    pinMode(INT1_L, OUTPUT); //chan DIR1
-    pinMode(INT2_L, OUTPUT); //chan DIR2
+    pinMode(PWM_FR, OUTPUT);
+    pinMode(I0_FR_1, OUTPUT);
+    pinMode(I0_FR_2, OUTPUT);
 
-    T = 0.01;
-    speedR = 0.00, pre_speedR = 0.00;
-    E1_R = 0, E1_1_R = 0, E1_2_R = 0;
-    OutputR = 0, LastOutputR = 0;
-    KpR = 1000, KdR = 23.0, KiR = 15.0;
+    pinMode(PWM_BL, OUTPUT);
+    pinMode(I0_BL_1, OUTPUT);
+    pinMode(I0_BL_2, OUTPUT);
 
-    speedL = 0.00, pre_speedL = 0.00;
-    E1_L = 0, E1_1_L = 0, E1_2_L = 0;
-    OutputL = 0, LastOutputL = 0;
-    KpL = 1300, KdL = 23.0, KiL = 10.0;
+    pinMode(PWM_BR, OUTPUT);
+    pinMode(I0_BR_1, OUTPUT);
+    pinMode(I0_BR_2, OUTPUT);
 
-    //attachInterrupt(digitalPinToInterrupt(A1), cal_encoderL, FALLING);
-    //attachInterrupt(digitalPinToInterrupt(A2), cal_encoderR, FALLING);
-    attachInterrupt(digitalPinToInterrupt(A1), cal_encoderL, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(A2), cal_encoderR, CHANGE);
+    speedFL = 0.00, pre_speedFL = 0.00;
+    E1_FL = 0, E1_1_FL = 0, E1_2_FL = 0;
+    OutputFL = 0, LastOutputFL = 0;
+    KpFL = 1000, KiFL = 23.0, KdFL = 15.0;
+
+    speedFR = 0.00, pre_speedFR = 0.00;
+    E1_FR = 0, E1_1_FR = 0, E1_2_FR = 0;
+    OutputFR = 0, LastOutputFR = 0;
+    KpFR = 1000, KiFR = 23.0, KdFR = 15.0;
+
+    speedBL = 0.00, pre_speedBL = 0.00;
+    E1_BL = 0, E1_1_BL = 0, E1_2_BL = 0;
+    OutputBL = 0, LastOutputBL = 0;
+    KpBL = 1000, KiBL = 23.0, KdBL = 15.0;
+
+    speedBR = 0.00, pre_speedBR = 0.00;
+    E1_BR = 0, E1_1_BR = 0, E1_2_BR = 0;
+    OutputBR = 0, LastOutputBR = 0;
+    KpBR = 1000, KiBR = 23.0, KdBR = 15.0;
+
+    attachInterrupt(0, cal_encoderFL, FALLING);
+    attachInterrupt(1, cal_encoderFR, FALLING);
+    attachInterrupt(5, cal_encoderBL, FALLING);
+    attachInterrupt(4, cal_encoderBR, FALLING);
 }
 
 void motor_driver::motor_Right(int Pulse_Width)
@@ -80,340 +101,291 @@ void motor_driver::motor_Left(int Pulse_Width)
     }
 }
 
-void motor_driver::read_EncoderL()
+void motor_driver::DemxungFL()
 {
-    if (digitalRead(B1) == 0)
+    if (digitalRead(INTERRUPT_FL_2) == HIGH)
     {
-        if (digitalRead(A1) == 0)
-        {
-            // A fell, B is low
-            pulsesL++; // Moving forward
-            pulseL_PID++;
-        }
-        else
-        {
-            // A rose, B is high
-            pulsesL--; // Moving reverse
-            pulseL_PID--;
-        }
+        pulsesFL--;
+        pulseFL_PID--;
     }
     else
     {
-        if (digitalRead(A1) == 0)
-        {
-            pulsesL--; // Moving reverse
-            pulseL_PID--;
-        }
-        else
-        {
-            // A rose, B is low
-            pulsesL++; // Moving forward
-            pulseL_PID++;
-        }
+        pulsesFL++;
+        pulseFL_PID++;
     }
 }
 
-void motor_driver::read_EncoderR()
+void motor_driver::DemxungFR()
 {
-    if (digitalRead(B2) == 0)
+    if (digitalRead(INTERRUPT_FR_2) == HIGH)
     {
-        if (digitalRead(A2) == 0)
-        {
-            // A fell, B is low
-            pulsesR--; // Moving forward
-            pulseR_PID--;
-        }
-        else
-        {
-            // A rose, B is high
-            pulsesR++; // Moving reverse
-            pulseR_PID++;
-        }
+        pulsesFR--;
+        pulseFR_PID--;
     }
     else
     {
-        if (digitalRead(A2) == 0)
-        {
-            pulsesR++; // Moving reverse
-            pulseR_PID++;
-        }
-        else
-        {
-            // A rose, B is low
-            pulsesR--; // Moving forward
-            pulseR_PID--;
-        }
+        pulsesFR++;
+        pulseFR_PID++;
     }
 }
 
-// void motor_driver::read_EncoderL()
-// {
-//     if (digitalRead(B1) == HIGH)
-//     {
-//         pulsesL--; // Moving reverse
-//         pulseL_PID--;
-//     }
-//     else
-//     {
-//         pulsesL++; // Moving forward
-//         pulseL_PID++;
-//     }
-// }
+void motor_driver::DemxungBL()
+{
+    if (digitalRead(INTERRUPT_BL_2) == HIGH)
+    {
+        pulsesBL--;
+        pulseBL_PID--;
+    }
+    else
+    {
+        pulsesBL++;
+        pulseBL_PID++;
+    }
+}
 
-// void motor_driver::read_EncoderR()
-// {
-//     if (digitalRead(B2) == HIGH)
-//     {
-//         // A fell, B is low
-//         pulsesR++; // Moving forward
-//         pulseR_PID++;
-//     }
-//     else
-//     {
-//         pulsesR--; // Moving reverse
-//         pulseR_PID--;
-//     }
-// }
+void motor_driver::DemxungBR()
+{
+    if (digitalRead(INTERRUPT_BR_2) == HIGH)
+    {
+        pulsesBR--;
+        pulseBR_PID--;
+    }
+    else
+    {
+        pulsesBR++;
+        pulseBR_PID++;
+    }
+}
 
 void motor_driver::PID()
 {
-    if (setpointL == 0 && setpointR != 0)
+
+    // ---------------FRONT LEFT PID
+    speedFL = (pulseFL_PID / 616) * (1 / T) * 60;
+    speedFL = speedFL * LPF_heso + pre_speedFL * (1 - LPF_heso);
+    pre_speedFL = speedFL;
+    pulseFL_PID = 0;
+    E1_FL = setpointFL - speedFL;
+    alphaFL = 2 * T * KpFL + KiFL * T * T + 2 * KdFL;
+    betaFL = T * T * KiFL - 4 * KdFL - 2 * T * KpFL;
+    gamaFL = 2 * KdFL;
+
+    OutputFL = (alphaFL * E1_FL + betaFL * E1_1_FL + gamaFL * E1_2_FL + 2 * T * LastOutputFL / (2 * T));
+
+    LastOutputFL = OutputFL;
+    E1_2_FL = E1_1_FL;
+    E1_1_FL = E1_FL;
+
+    // ---------------FRONT RIGHT PID
+
+    speedFR = (pulseFR_PID / 616) * (1 / T) * 60;
+    speedFR = speedFR * LPF_heso + pre_speedFR * (1 - LPF_heso);
+    pre_speedFR = speedFR;
+    pulseFR_PID = 0;
+    E1_FR = setpointFR - speedFR;
+    alphaFR = 2 * T * KpFR + KiFR * T * T + 2 * KdFR;
+    betaFR = T * T * KiFR - 4 * KdFR - 2 * T * KpFR;
+    gamaFR = 2 * KdFR;
+
+    OutputFR = (alphaFR * E1_FR + betaFR * E1_1_FR + gamaFR * E1_2_FR + 2 * T * LastOutputFR / (2 * T));
+
+    LastOutputFR = OutputFR;
+    E1_2_FR = E1_1_FR;
+    E1_1_FR = E1_FR;
+
+    // ---------------BACK LEFT PID
+
+    speedBL = (pulseBL_PID / 616) * (1 / T) * 60;
+    speedBL = speedBL * LPF_heso + pre_speedBL * (1 - LPF_heso);
+    pre_speedBL = speedBL;
+    pulseBL_PID = 0;
+    E1_BL = setpointBL - speedBL;
+    alphaBL = 2 * T * KpBL + KiBL * T * T + 2 * KdBL;
+    betaBL = T * T * KiBL - 4 * KdBL - 2 * T * KpBL;
+    gamaBL = 2 * KdBL;
+
+    OutputBL = (alphaBL * E1_BL + betaBL * E1_1_BL + gamaBL * E1_2_BL + 2 * T * LastOutputBL / (2 * T));
+
+    LastOutputBL = OutputBL;
+    E1_2_BL = E1_1_BL;
+    E1_1_BL = E1_BL;
+
+    // ---------------BACK RIGHT PID
+
+    speedBR = (pulseBR_PID / 616) * (1 / T) * 60;
+    speedBR = speedBR * LPF_heso + pre_speedBR * (1 - LPF_heso);
+    pre_speedBR = speedBR;
+    pulseBR_PID = 0;
+    E1_BR = setpointBR - speedBR;
+    alphaBR = 2 * T * KpBR + KiBR * T * T + 2 * KdBR;
+    betaBR = T * T * KiBR - 4 * KdBR - 2 * T * KpBR;
+    gamaBR = 2 * KdBR;
+
+    OutputBR = (alphaBR * E1_BR + betaBR * E1_1_BR + gamaBLR* E1_2_BR + 2 * T * LastOutputBR / (2 * T));
+
+    LastOutputBR = OutputBR;
+    E1_2_BR = E1_1_BR;
+    E1_1_BR = E1_BR;
+
+    if (OutputFL > 255)
+        OutputFL = 255;
+    if (OutputFL < -255)
+        OutputFL = -255;
+
+    if (OutputFR > 255)
+        OutputFR = 255;
+    if (OutputFR < -255)
+        OutputFR = -225;
+
+    if (OutputBL > 255)
+        OutputBL = 255;
+    if (OutputBL < -255)
+        OutputBL = -225;
+    
+    if (OutputBR > 255)
+        OutputBR = 255;
+    if (OutputBR < -255)
+        OutputBR = -225;
+
+    // --- PWD FL
+    if (OutputFL > 0)
     {
-        analogWrite(EN_L, 0);
-        digitalWrite(INT1_L, LOW);
-        digitalWrite(INT2_L, LOW);
-        pulseL_PID = 0;
-        speedL = 0;
-        E1_L = 0;
-        E1_1_L = 0;
-        E1_2_L = 0;
-        alphaL = 0;
-        betaL = 0;
-        gamaL = 0;
-        OutputL = 0;
-
-        speedR = (pulseR_PID / 1050) * (1 / T) * 60;
-        speedR = speedR * LPF_heso + pre_speedR * (1 - LPF_heso);
-        pre_speedR = speedR;
-        pulseR_PID = 0;
-        E1_R = setpointR - speedR;
-
-        alphaR = 2 * T * KpR + KiR * T * T + 2 * KdR;
-        betaR = T * T * KiR - 4 * KdR - 2 * T * KpR;
-        gamaR = 2 * KdR;
-
-        OutputR = (alphaR * E1_R + betaR * E1_1_R + gamaR * E1_2_R + 2 * T * LastOutputR / (2 * T));
-        LastOutputR = OutputR;
-        E1_2_R = E1_1_R;
-        E1_1_R = E1_R;
-
-        if (OutputR > 255)
-            OutputR = 255;
-        if (OutputR < -255)
-            OutputR = -255;
-
-        if (OutputR > 0)
-        {
-            analogWrite(EN_R, OutputR);
-            digitalWrite(INT1_R, LOW);
-            digitalWrite(INT2_R, HIGH);
-        }
-        else if (OutputR < 0)
-        {
-            analogWrite(EN_R, abs(OutputR));
-            digitalWrite(INT1_R, HIGH);
-            digitalWrite(INT2_R, LOW);
-        }
-        else
-        {
-            analogWrite(EN_R, OutputR);
-            digitalWrite(INT1_R, LOW);
-            digitalWrite(INT2_R, LOW);
-        }
+        analogWrite(PWD_FL, OutputFL);
+        digitalWrite(I0_FL_1, LOW);
+        digitalWrite(I0_FL_2, HIGH);
     }
-    else if (setpointR == 0 && setpointL != 0)
+    else if (OutputFL < 0)
     {
-        analogWrite(EN_R, 0);
-        digitalWrite(INT1_R, LOW);
-        digitalWrite(INT2_R, LOW);
-        pulseR_PID = 0;
-        speedR = 0;
-        E1_R = 0;
-        E1_1_R = 0;
-        E1_2_R = 0;
-        alphaR = 0;
-        betaR = 0;
-        gamaR = 0;
-        OutputR = 0;
-
-        speedL = (pulseL_PID / 1050) * (1 / T) * 60;
-        speedL = speedL * LPF_heso + pre_speedL * (1 - LPF_heso);
-        pre_speedL = speedL;
-        pulseL_PID = 0;
-        E1_L = setpointL - speedL;
-
-        alphaL = 2 * T * KpL + KiL * T * T + 2 * KdL;
-        betaL = T * T * KiL - 4 * KdL - 2 * T * KpL;
-        gamaL = 2 * KdL;
-
-        OutputL = (alphaL * E1_L + betaL * E1_1_L + gamaL * E1_2_L + 2 * T * LastOutputL / (2 * T));
-        LastOutputL = OutputL;
-        E1_2_L = E1_1_L;
-        E1_1_L = E1_L;
-
-        if (OutputL > 255)
-            OutputL = 255;
-        if (OutputL < -255)
-            OutputL = -225;
-
-        if (OutputL > 0)
-        {
-            analogWrite(EN_L, OutputL);
-            digitalWrite(INT1_L, LOW);
-            digitalWrite(INT2_L, HIGH);
-        }
-        else if (OutputL < 0)
-        {
-            analogWrite(EN_L, abs(OutputL));
-            digitalWrite(INT1_L, HIGH);
-            digitalWrite(INT2_L, LOW);
-        }
-        else
-        {
-            analogWrite(EN_L, OutputL);
-            digitalWrite(INT1_L, LOW);
-            digitalWrite(INT2_L, LOW);
-        }
-    }
-    else if (setpointR == 0 && setpointL == 0)
-    {
-        analogWrite(EN_R, 0);
-        digitalWrite(INT1_R, LOW);
-        digitalWrite(INT2_R, LOW);
-        pulseR_PID = 0;
-        speedR = 0;
-        E1_R = 0;
-        E1_1_R = 0;
-        E1_2_R = 0;
-        alphaR = 0;
-        betaR = 0;
-        gamaR = 0;
-        OutputR = 0;
-
-        analogWrite(EN_L, 0);
-        digitalWrite(INT1_L, LOW);
-        digitalWrite(INT2_L, LOW);
-        pulseL_PID = 0;
-        speedL = 0;
-        E1_L = 0;
-        E1_1_L = 0;
-        E1_2_L = 0;
-        alphaL = 0;
-        betaL = 0;
-        gamaL = 0;
-        OutputL = 0;
+        analogWrite(PWD_FL, abs(OutputFL));
+        digitalWrite(I0_FL_1, HIGH);
+        digitalWrite(I0_FL_2, LOW);
     }
     else
     {
-        speedR = (pulseR_PID / 1050) * (1 / T) * 60;
-        speedR = speedR * LPF_heso + pre_speedR * (1 - LPF_heso);
-        pre_speedR = speedR;
-        pulseR_PID = 0;
-        E1_R = setpointR - speedR;
-        alphaR = 2 * T * KpR + KiR * T * T + 2 * KdR;
-        betaR = T * T * KiR - 4 * KdR - 2 * T * KpR;
-        gamaR = 2 * KdR;
+        analogWrite(PWD_FL, OutputFL);
+        digitalWrite(I0_FL_1, LOW);
+        digitalWrite(I0_FL_2, LOW);
+    }
 
-        OutputR = (alphaR * E1_R + betaR * E1_1_R + gamaR * E1_2_R + 2 * T * LastOutputR / (2 * T));
+    // --- PWD FR
+    if (OutputFR > 0)
+    {
+        analogWrite(PWD_FR, OutputFR);
+        digitalWrite(I0_FR_1, LOW);
+        digitalWrite(I0_FR_2, HIGH);
+    }
+    else if (OutputFR < 0)
+    {
+        analogWrite(PWD_FR, abs(OutputFR));
+        digitalWrite(I0_FR_1, HIGH);
+        digitalWrite(I0_FR_2, LOW);
+    }
+    else
+    {
+        analogWrite(PWD_FR, OutputFR);
+        digitalWrite(I0_FR_1, LOW);
+        digitalWrite(I0_FR_2, LOW);
+    }
 
-        LastOutputR = OutputR;
-        E1_2_R = E1_1_R;
-        E1_1_R = E1_R;
+    // --- PWD BL
+    if (OutputBL > 0)
+    {
+        analogWrite(PWD_BL, OutputBL);
+        digitalWrite(I0_BL_1, LOW);
+        digitalWrite(I0_BL_2, HIGH);
+    }
+    else if (OutputBL < 0)
+    {
+        analogWrite(PWD_BL, abs(OutputBL));
+        digitalWrite(I0_BL_1, HIGH);
+        digitalWrite(I0_BL_2, LOW);
+    }
+    else
+    {
+        analogWrite(PWD_BL, OutputBL);
+        digitalWrite(I0_BL_1, LOW);
+        digitalWrite(I0_BL_2, LOW);
+    }
 
-        speedL = (pulseL_PID / 1050) * (1 / T) * 60;
-        speedL = speedL * LPF_heso + pre_speedL * (1 - LPF_heso);
-        pre_speedL = speedL;
-        pulseL_PID = 0;
-        E1_L = setpointL - speedL;
-
-        alphaL = 2 * T * KpL + KiL * T * T + 2 * KdL;
-        betaL = T * T * KiL - 4 * KdL - 2 * T * KpL;
-        gamaL = 2 * KdL;
-
-        OutputL = (alphaL * E1_L + betaL * E1_1_L + gamaL * E1_2_L + 2 * T * LastOutputL / (2 * T));
-
-        LastOutputL = OutputL;
-        E1_2_L = E1_1_L;
-        E1_1_L = E1_L;
-
-        if (OutputR > 255)
-            OutputR = 255;
-        if (OutputR < -255)
-            OutputR = -255;
-
-        if (OutputL > 255)
-            OutputL = 255;
-        if (OutputL < -255)
-            OutputL = -225;
-
-        if (OutputR > 0)
-        {
-            analogWrite(EN_R, OutputR);
-            digitalWrite(INT1_R, LOW);
-            digitalWrite(INT2_R, HIGH);
-        }
-        else if (OutputR < 0)
-        {
-            analogWrite(EN_R, abs(OutputR));
-            digitalWrite(INT1_R, HIGH);
-            digitalWrite(INT2_R, LOW);
-        }
-        else
-        {
-            analogWrite(EN_R, OutputR);
-            digitalWrite(INT1_R, LOW);
-            digitalWrite(INT2_R, LOW);
-        }
-
-        if (OutputL > 0)
-        {
-            analogWrite(EN_L, OutputL);
-            digitalWrite(INT1_L, LOW);
-            digitalWrite(INT2_L, HIGH);
-        }
-        else if (OutputL < 0)
-        {
-            analogWrite(EN_L, abs(OutputL));
-            digitalWrite(INT1_L, HIGH);
-            digitalWrite(INT2_L, LOW);
-        }
-        else
-        {
-            analogWrite(EN_L, OutputL);
-            digitalWrite(INT1_L, LOW);
-            digitalWrite(INT2_L, LOW);
-        }
+    // --- PWD BR
+    if (OutputBR > 0)
+    {
+        analogWrite(PWD_BR, OutputBR);
+        digitalWrite(I0_BR_1, LOW);
+        digitalWrite(I0_BR_2, HIGH);
+    }
+    else if (OutputBR < 0)
+    {
+        analogWrite(PWD_BR, abs(OutputBR));
+        digitalWrite(I0_BR_1, HIGH);
+        digitalWrite(I0_BR_2, LOW);
+    }
+    else
+    {
+        analogWrite(PWD_BR, OutputBR);
+        digitalWrite(I0_BR_1, LOW);
+        digitalWrite(I0_BR_2, LOW);
     }
 }
 
-double motor_driver::getSpeedL()
+double motor_driver::getSpeedFL()
 {
-    return speedL;
+    return speedFL;
 }
 
-double motor_driver::getSpeedR()
+double motor_driver::getSpeedFR()
 {
-    return speedR;
+    return speedFR;
 }
 
-void motor_driver::setSetpointL(float spL)
+double motor_driver::getSpeedBL()
 {
-    setpointL = spL;
+    return speedBL;
 }
 
-void motor_driver::setSetpointR(float spR)
+double motor_driver::getSpeedBR()
 {
-    setpointR = spR;
+    return speedBR;
+}
+
+void motor_driver::setSetpointFL(float setpoint)
+{
+    setpointFL = setpoint;
+}
+
+void motor_driver::setSetpointFR(float setpoint)
+{
+    setpointFR = setpoint;
+}
+
+void motor_driver::setSetpointBL(float setpoint)
+{
+    setpointBL = setpoint;
+}
+
+void motor_driver::setSetpointBR(float setpoint)
+{
+    setpointBR = setpoint;
+}
+
+void motor_driver::setpulseFL_PID(float pulse)
+{
+    pulseFL_PID = pulse;
+}
+
+void motor_driver::setpulseFR_PID(float pulse)
+{
+    pulseFR_PID = pulse;
+}
+
+void motor_driver::setpulseBL_PID(float pulse)
+{
+    pulseBL_PID = pulse;
+}
+
+void motor_driver::setpulseBR_PID(float pulse)
+{
+    pulseBR_PID = pulse;
 }
 
 void motor_driver::setpulseL_PID(float pulse)
@@ -426,12 +398,22 @@ void motor_driver::setpulseR_PID(float pulse)
     pulseR_PID = pulse;
 }
 
-int32_t motor_driver::getLeftencoder()
+int32_t motor_driver::getFLencoder()
 {
-    return pulsesL;
+    return pulsesFL;
 }
 
-int32_t motor_driver::getRightencoder()
+int32_t motor_driver::getFRencoder()
 {
-    return pulsesR;
+    return pulsesFR;
+}
+
+int32_t motor_driver::getBLencoder()
+{
+    return pulsesBL;
+}
+
+int32_t motor_driver::getBRencoder()
+{
+    return pulsesBR;
 }

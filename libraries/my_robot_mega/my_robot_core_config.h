@@ -34,31 +34,33 @@
 // #define DEBUG_LOG_FREQUENCY                    10       /*!< Frequency in Hz to send log debug messages */
 
 /* Linear & Angular velocity index */
-#define WHEEL_NUM       2                       /*!< Num wheel */
+#define WHEEL_NUM       4                       /*!< Num wheel */
 
-#define LEFT            0                       /*!< Left wheel index */
-#define RIGHT           1                       /*!< Right wheel index */
+#define FLEFT            0                       /*!< Front Left wheel index */
+#define FRIGHT           1                       /*!< Front Right wheel index */
+#define BLEFT            2                       /*!< Back Left wheel index */
+#define BRIGHT           3                       /*!< Back Right wheel index */
 
-#define LINEAR          0                       /*!< Linear velocity index */
-#define ANGULAR         1                       /*!< Angular velocity index */
+#define LINEARX          0                       /*!< Linear x velocity index */
+#define LINEARY          1                       /*!< Linear y velocity index */
+#define ANGULAR          2                       /*!< Angular velocity index */
 
-#define PULSE2RADR                         0.006283185  // 1[pulse] * 2 * 3.14159265359 / 1000 = 0.010199976f
-#define PULSE2RADL                         0.006283185 
+#define PULSE2RAD                         0.010199976  // 1[pulse] * 2 * 3.14159265359 / 1000 = 0.006283185f
+#define radtorpm 9.5 
 
-//#define MIN_LINEAR_VELOCITY  -7.01
-//#define MAX_LINEAR_VELOCITY  7.01
+#define MIN_LINEAR_VELOCITYX  -0.22
+#define MAX_LINEAR_VELOCITYX  0.22
 
-#define MIN_LINEAR_VELOCITY  -0.22
-#define MAX_LINEAR_VELOCITY  0.22
-
-//#define MIN_ANGULAR_VELOCITY -0.3
-//#define MAX_ANGULAR_VELOCITY 0.3
+#define MIN_LINEAR_VELOCITYY  -0.22
+#define MAX_LINEAR_VELOCITYY  0.22
 
 #define MIN_ANGULAR_VELOCITY -2.75
 #define MAX_ANGULAR_VELOCITY 2.75
 
-#define WHEEL_RADIUS 0.022 //meter
+#define WHEEL_RADIUS 0.049 //meter
 #define WHEEL_SEPRATION 0.287 //meter
+#define WHEEL_SEPARATION_WIDTH 0.287
+#define WHEEL_SEPARATION_LENGTH 0.15
 
 /*******************************************************************************
 * ROS Parameter
@@ -80,15 +82,14 @@ ros::Subscriber<geometry_msgs::Twist> cmd_vel_sub("cmd_vel", commandVelocityCall
 ros::Time rosNow(void);
 
 void updateVariable(bool isConnected);
-void updateMotorInfo(int32_t left_pulse, int32_t right_pulse);
+void updateMotorInfo(int32_t front_left_pulse, int32_t front_right_pulse, int32_t back_left_pulse, int32_t back_right_pulse);
 void updateTime(void);
 void updateOdometry(void);
 void updateJointStates(void);
 void updateTF(geometry_msgs::TransformStamped& odom_tf);
 void publishDriveInformation(void);
-// void updateGyroCali(bool isConnected);
 void updateGoalVelocity(void);
-// void updateTFPrefix(bool isConnected);
+void updateTFPrefix(bool isConnected);
 
 void initOdom(void);
 void initJointStates(void);
@@ -132,13 +133,13 @@ static double tTime[10];
 * Calculation for odometry
 *******************************************************************************/
 bool init_encoder = true;
-int32_t last_diff_pulse[WHEEL_NUM] = {0, 0};
-double  last_rad[WHEEL_NUM]       = {0.0, 0.0};
+int32_t last_diff_pulse[WHEEL_NUM] = {0, 0, 0, 0};
+double  last_rad[WHEEL_NUM]       = {0.0, 0.0, 0.0, 0.0};
 
 /*******************************************************************************
 * Update Joint State
 *******************************************************************************/
-double  last_velocity[WHEEL_NUM]  = {0.0, 0.0};
+double  last_velocity[WHEEL_NUM]  = {0.0, 0.0, 0.0, 0.0};
 
 /*******************************************************************************
 * Declaration for SLAM and navigation
@@ -152,11 +153,10 @@ double odom_vel[3];
 /*******************************************************************************
 * Declaration for controllers
 *******************************************************************************/
-float zero_velocity[WHEEL_NUM] = {0.0, 0.0};
-float goal_velocity[WHEEL_NUM] = {0.0, 0.0};
-float goal_velocity_from_button[WHEEL_NUM] = {0.0, 0.0};
-float goal_velocity_from_cmd[WHEEL_NUM] = {0.0, 0.0};
-float goal_velocity_from_rc100[WHEEL_NUM] = {0.0, 0.0};
+float zero_velocity[WHEEL_NUM] = {0.0, 0.0, 0.0, 0.0};
+float goal_velocity[WHEEL_NUM] = {0.0, 0.0, 0.0, 0.0};
+float goal_velocity_from_button[WHEEL_NUM] = {0.0, 0.0, 0.0, 0.0};
+float goal_velocity_from_cmd[WHEEL_NUM] = {0.0, 0.0, 0.0, 0.0};
 
 //MPU9250 mpu;
 

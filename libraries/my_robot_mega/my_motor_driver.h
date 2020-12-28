@@ -4,20 +4,29 @@
 #include <Arduino.h>
 #include <ros.h>
 
-#define EN_L 4
-#define EN_R 5
+#define INTERRUPT_FL_1 2
+#define INTERRUPT_FL_2 39
+#define PWM_FL 5
+#define I0_FL_1 27
+#define I0_FL_2 29
 
-#define INT1_L 25
-#define INT2_L 23
+#define INTERRUPT_FR_1 3
+#define INTERRUPT_FR_2 41
+#define PWM_FR 4
+#define I0_FR_1 23
+#define I0_FR_2 25
 
-#define INT1_R 29
-#define INT2_R 27
+#define INTERRUPT_BL_1 18
+#define INTERRUPT_BL_2 43
+#define PWM_BL 7
+#define I0_BL_1 35
+#define I0_BL_2 37
 
-#define A1 2
-#define B1 39
-
-#define A2 3
-#define B2 41
+#define INTERRUPT_BR_1 19
+#define INTERRUPT_BR_2 45
+#define PWM_BR 6
+#define I0_BR_1 33
+#define I0_BR_2 31
 
 #define SAMPLE_DELAY 1000
 #define PULSES_PER_TURN 181.5
@@ -27,45 +36,68 @@
 
 #define LPF_heso 0.08
 
-
 class motor_driver
 {
-    public:
-        motor_driver();
-        void init(void);
-        void motor_Right(int);
-        void motor_Left(int);
-        void control_Motor(const float wheel_rad, const float wheel_sep,float* cmd_value,double time);
-        void read_EncoderL();
-        static void cal_encoderL();
-        void read_EncoderR();
-        static void cal_encoderR();
-        int32_t getLeftencoder();
-        int32_t getRightencoder();
-        void PID();
-	    double getSpeedL();
-        double getSpeedR();
-	    void setSetpointL(float);
-	    void setSetpointR(float);
-        void setpulseR_PID(float);
-        void setpulseL_PID(float);
-    private:
-        int32_t pulsesL, pulsesR;
-        //PID
-	    double T;
-        
-        double pulseR_PID;
-        double speedR, setpointR, pre_speedR;
-        double E1_R, E1_1_R, E1_2_R;
-        double alphaR, betaR, gamaR, KpR, KiR, KdR;
-        double OutputR, LastOutputR;
+public:
+    motor_driver();
+    void init(void);
+    void motor_Right(int);
+    void motor_Left(int);
+    void DemxungFL();
+    static void cal_encoderFL();
+    void DemxungFR();
+    static void cal_encoderFR();
+    void DemxungBL();
+    static void cal_encoderBL();
+    void DemxungBR();
+    static void cal_encoderBR();
+    int32_t getFLencoder();
+    int32_t getFRencoder();
+    int32_t getBLencoder();
+    int32_t getBRencoder();
+    void PID();
+    double getSpeedFL();
+    double getSpeedFR();
+    double getSpeedBL();
+    double getSpeedBR();
+    void setSetpointFL(float);
+    void setSetpointFR(float);
+    void setSetpointBL(float);
+    void setSetpointBR(float);
+    void setpulseFL_PID(float);
+    void setpulseFR_PID(float);
+    void setpulseBL_PID(float);
+    void setpulseBR_PID(float);
 
-        double pulseL_PID;
-        double speedL, setpointL, pre_speedL;
-        double E1_L, E1_1_L, E1_2_L;
-        double alphaL, betaL, gamaL, KpL ,KiL ,KdL;
-        double OutputL, LastOutputL;
+private:
+    int32_t pulsesFL, pulsesFR;
+    int32_t pulsesBL, pulsesBR;
+    //PID
+    double T;
 
+    double pulseFL_PID;
+    double speedFL, setpointFL, pre_speedFL;
+    double E1_FL, E1_1_FL, E1_2_FL;
+    double alphaFL, betaFL, gamaFL, KpFL, KiFL, KdFL;
+    double OutputFL, LastOutputFL;
+
+    double pulseFR_PID;
+    double speedFR, setpointFR, pre_speedFR;
+    double E1_FR, E1_1_FR, E1_2_FR;
+    double alphaFR, betaFR, gamaFR, KpFR, KiFR, KdFR;
+    double OutputFR, LastOutputFR;
+
+    double pulseBL_PID;
+    double speedBL, setpointBL, pre_speedBL;
+    double E1_BL, E1_1_BL, E1_2_BL;
+    double alphaBL, betaBL, gamaBL, KpBL, KiBL, KdBL;
+    double OutputBL, LastOutputBL;
+
+    double pulseBR_PID;
+    double speedBR, setpointBR, pre_speedBR;
+    double E1_BR, E1_1_BR, E1_2_BR;
+    double alphaBR, betaBR, gamaBR, KpBR, KiBR, KdBR;
+    double OutputBR, LastOutputBR;
 };
 
-#endif 
+#endif
