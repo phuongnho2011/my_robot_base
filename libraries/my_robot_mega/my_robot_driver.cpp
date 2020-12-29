@@ -57,50 +57,6 @@ void motor_driver::init()
     attachInterrupt(4, cal_encoderBR, FALLING);
 }
 
-void motor_driver::motor_Right(int Pulse_Width)
-{
-    if (Pulse_Width > 0)
-    {
-        analogWrite(EN_R, Pulse_Width);
-        digitalWrite(INT1_R, LOW);
-        digitalWrite(INT2_R, HIGH);
-    }
-    else if (Pulse_Width < 0)
-    {
-        analogWrite(EN_R, abs(Pulse_Width));
-        digitalWrite(INT1_R, HIGH);
-        digitalWrite(INT2_R, LOW);
-    }
-    else
-    {
-        analogWrite(EN_R, Pulse_Width);
-        digitalWrite(INT1_R, LOW);
-        digitalWrite(INT2_R, LOW);
-    }
-}
-
-void motor_driver::motor_Left(int Pulse_Width)
-{
-    if (Pulse_Width > 0)
-    {
-        analogWrite(EN_L, Pulse_Width);
-        digitalWrite(INT1_L, LOW);
-        digitalWrite(INT2_L, HIGH);
-    }
-    else if (Pulse_Width < 0)
-    {
-        analogWrite(EN_L, abs(Pulse_Width));
-        digitalWrite(INT1_L, HIGH);
-        digitalWrite(INT2_L, LOW);
-    }
-    else
-    {
-        analogWrite(EN_L, Pulse_Width);
-        digitalWrite(INT1_L, LOW);
-        digitalWrite(INT2_L, LOW);
-    }
-}
-
 void motor_driver::DemxungFL()
 {
     if (digitalRead(INTERRUPT_FL_2) == HIGH)

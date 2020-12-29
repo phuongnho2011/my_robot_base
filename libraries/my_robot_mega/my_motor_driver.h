@@ -41,8 +41,6 @@ class motor_driver
 public:
     motor_driver();
     void init(void);
-    void motor_Right(int);
-    void motor_Left(int);
     void DemxungFL();
     static void cal_encoderFL();
     void DemxungFR();
