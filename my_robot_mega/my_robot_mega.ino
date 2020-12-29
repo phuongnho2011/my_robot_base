@@ -53,7 +53,7 @@ void loop()
 
   if ((t - tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
   {
-    updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
+    updateMotorInfo(mt_driver.getFLencoder(), mt_driver.getFRencoder(), mt_driver.getBLencoder(), mt_driver.getBRencoder());
     publishDriveInformation();
     tTime[2] = t;
   }
@@ -62,10 +62,14 @@ void loop()
   {
     if (t - tTime[6] > CONTROL_MOTOR_TIMEOUT)
     {
-      mt_driver.setSetpointL(0);
-      mt_driver.setSetpointR(0);
-      mt_driver.setpulseL_PID(0);
-      mt_driver.setpulseR_PID(0);
+      mt_driver.setSetpointFL(0);
+      mt_driver.setSetpointFR(0);
+      mt_driver.setSetpointBL(0);
+      mt_driver.setSetpointBR(0);
+      mt_driver.setpulseFL_PID(0);
+      mt_driver.setpulseFR_PID(0);
+      mt_driver.setpulseBL_PID(0);
+      mt_driver.setpulseBR_PID(0);
     }
     else
     {
@@ -304,7 +308,7 @@ void updateMotorInfo(int32_t fleft_pulse, int32_t fright_pulse, int32_t bleft_pu
 
   last_diff_pulse[FLEFT] = fleft_pulse - last_pulse[FLEFT];
   last_pulse[FLEFT] = fleft_pulse;
-  last_radF[FLEFT] += PULSE2RAD * (double)last_diff_pulse[FLEFT];
+  last_rad[FLEFT] += PULSE2RAD * (double)last_diff_pulse[FLEFT];
 
   last_diff_pulse[FRIGHT] = fright_pulse - last_pulse[FRIGHT];
   last_pulse[FRIGHT] = fright_pulse;
@@ -312,7 +316,7 @@ void updateMotorInfo(int32_t fleft_pulse, int32_t fright_pulse, int32_t bleft_pu
 
   last_diff_pulse[BLEFT] = bleft_pulse - last_pulse[BLEFT];
   last_pulse[BLEFT] = bleft_pulse;
-  last_radF[BLEFT] += PULSE2RAD * (double)last_diff_pulse[BLEFT];
+  last_rad[BLEFT] += PULSE2RAD * (double)last_diff_pulse[BLEFT];
 
   last_diff_pulse[BRIGHT] = bright_pulse - last_pulse[BRIGHT];
   last_pulse[BRIGHT] = bright_pulse;
