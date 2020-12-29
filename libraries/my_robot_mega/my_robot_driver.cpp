@@ -177,7 +177,7 @@ void motor_driver::PID()
     betaBR = T * T * KiBR - 4 * KdBR - 2 * T * KpBR;
     gamaBR = 2 * KdBR;
 
-    OutputBR = (alphaBR * E1_BR + betaBR * E1_1_BR + gamaBLR* E1_2_BR + 2 * T * LastOutputBR / (2 * T));
+    OutputBR = (alphaBR * E1_BR + betaBR * E1_1_BR + gamaBR* E1_2_BR + 2 * T * LastOutputBR / (2 * T));
 
     LastOutputBR = OutputBR;
     E1_2_BR = E1_1_BR;
@@ -203,82 +203,82 @@ void motor_driver::PID()
     if (OutputBR < -255)
         OutputBR = -225;
 
-    // --- PWD FL
+    // --- PWM FL
     if (OutputFL > 0)
     {
-        analogWrite(PWD_FL, OutputFL);
+        analogWrite(PWM_FL, OutputFL);
         digitalWrite(I0_FL_1, LOW);
         digitalWrite(I0_FL_2, HIGH);
     }
     else if (OutputFL < 0)
     {
-        analogWrite(PWD_FL, abs(OutputFL));
+        analogWrite(PWM_FL, abs(OutputFL));
         digitalWrite(I0_FL_1, HIGH);
         digitalWrite(I0_FL_2, LOW);
     }
     else
     {
-        analogWrite(PWD_FL, OutputFL);
+        analogWrite(PWM_FL, OutputFL);
         digitalWrite(I0_FL_1, LOW);
         digitalWrite(I0_FL_2, LOW);
     }
 
-    // --- PWD FR
+    // --- PWM FR
     if (OutputFR > 0)
     {
-        analogWrite(PWD_FR, OutputFR);
+        analogWrite(PWM_FR, OutputFR);
         digitalWrite(I0_FR_1, LOW);
         digitalWrite(I0_FR_2, HIGH);
     }
     else if (OutputFR < 0)
     {
-        analogWrite(PWD_FR, abs(OutputFR));
+        analogWrite(PWM_FR, abs(OutputFR));
         digitalWrite(I0_FR_1, HIGH);
         digitalWrite(I0_FR_2, LOW);
     }
     else
     {
-        analogWrite(PWD_FR, OutputFR);
+        analogWrite(PWM_FR, OutputFR);
         digitalWrite(I0_FR_1, LOW);
         digitalWrite(I0_FR_2, LOW);
     }
 
-    // --- PWD BL
+    // --- PWM BL
     if (OutputBL > 0)
     {
-        analogWrite(PWD_BL, OutputBL);
+        analogWrite(PWM_BL, OutputBL);
         digitalWrite(I0_BL_1, LOW);
         digitalWrite(I0_BL_2, HIGH);
     }
     else if (OutputBL < 0)
     {
-        analogWrite(PWD_BL, abs(OutputBL));
+        analogWrite(PWM_BL, abs(OutputBL));
         digitalWrite(I0_BL_1, HIGH);
         digitalWrite(I0_BL_2, LOW);
     }
     else
     {
-        analogWrite(PWD_BL, OutputBL);
+        analogWrite(PWM_BL, OutputBL);
         digitalWrite(I0_BL_1, LOW);
         digitalWrite(I0_BL_2, LOW);
     }
 
-    // --- PWD BR
+    // --- PWM BR
     if (OutputBR > 0)
     {
-        analogWrite(PWD_BR, OutputBR);
+        analogWrite(PWM_BR, OutputBR);
         digitalWrite(I0_BR_1, LOW);
         digitalWrite(I0_BR_2, HIGH);
     }
     else if (OutputBR < 0)
     {
-        analogWrite(PWD_BR, abs(OutputBR));
+        analogWrite(PWM_BR, abs(OutputBR));
         digitalWrite(I0_BR_1, HIGH);
         digitalWrite(I0_BR_2, LOW);
     }
     else
     {
-        analogWrite(PWD_BR, OutputBR);
+        analogWrite(PWM_BR, OutputBR);
         digitalWrite(I0_BR_1, LOW);
         digitalWrite(I0_BR_2, LOW);
     }
@@ -342,16 +342,6 @@ void motor_driver::setpulseBL_PID(float pulse)
 void motor_driver::setpulseBR_PID(float pulse)
 {
     pulseBR_PID = pulse;
-}
-
-void motor_driver::setpulseL_PID(float pulse)
-{
-    pulseL_PID = pulse;
-}
-
-void motor_driver::setpulseR_PID(float pulse)
-{
-    pulseR_PID = pulse;
 }
 
 int32_t motor_driver::getFLencoder()
