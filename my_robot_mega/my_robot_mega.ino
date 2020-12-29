@@ -414,23 +414,22 @@ ros::Time rosNow()
 
 void motor_driver::cal_encoderFL()
 {
-  mt_driver.read_EncoderFL();
+  mt_driver.DemxungFL();
 }
 
 void motor_driver::cal_encoderFR()
 {
-  mt_driver.read_EncoderFR();
+  mt_driver.DemxungFR();
 }
-
 
 void motor_driver::cal_encoderBL()
 {
-  mt_driver.read_EncoderBL();
+  mt_driver.DemxungBL();
 }
 
 void motor_driver::cal_encoderBR()
 {
-  mt_driver.read_EncoderBR();
+  mt_driver.DemxungBR();
 }
 
 /*******************************************************************************
