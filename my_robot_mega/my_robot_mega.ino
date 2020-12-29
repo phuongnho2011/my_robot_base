@@ -344,7 +344,7 @@ bool calcOdometry(double diff_time)
 {
   float yaw = 0;
   Vector norm;
-  double wheel_l, wheel_r; // rotation value of wheel [rad]
+  double wheel_fl, wheel_fr, wheel_bl, wheel_br; // rotation value of wheel [rad]
   double delta_x, delta_y, theta, delta_theta;
   static double last_theta = 0.0;
   double vx, vy, w; // v = translational velocity [m/s], w = rotational velocity [rad/s]
@@ -359,16 +359,22 @@ bool calcOdometry(double diff_time)
   if (step_time == 0)
     return false;
 
-  wheel_fl = PULSE2RADFL * (double)last_diff_pulse[FLEFT];
-  wheel_fr = PULSE2RADFR * (double)last_diff_pulse[FRIGHT];
-  wheel_bl = PULSE2RADBL * (double)last_diff_pulse[FLEFT];
-  wheel_br = PULSE2RADBR * (double)last_diff_pulse[FRIGHT];
+  wheel_fl = PULSE2RAD * (double)last_diff_pulse[FLEFT];
+  wheel_fr = PULSE2RAD * (double)last_diff_pulse[FRIGHT];
+  wheel_bl = PULSE2RAD * (double)last_diff_pulse[FLEFT];
+  wheel_br = PULSE2RAD * (double)last_diff_pulse[FRIGHT];
 
-  if (isnan(wheel_l))
-    wheel_l = 0.0;
+  if (isnan(wheel_fl))
+    wheel_fl = 0.0;
 
-  if (isnan(wheel_r))
-    wheel_r = 0.0;
+  if (isnan(wheel_fr))
+    wheel_fr = 0.0;
+
+  if (isnan(wheel_bl))
+    wheel_bl = 0.0;
+
+  if (isnan(wheel_br))
+    wheel_br = 0.0;
 
   norm = mpu.readNormalizeGyro();
   yaw = yaw + norm.ZAxis * step_time;
@@ -381,10 +387,9 @@ bool calcOdometry(double diff_time)
   vx = (mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() + mt_driver.getSpeedBR())*(WHEEL_RADIUS/4);
   vy = (- mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() - mt_driver.getSpeedBR())*(WHEEL_RADIUS/4);
 
-  double delta_x = (vx * cos(w) - vy * sin(w)) * step_time;
-  double delta_y = (vx * sin(w) + vy * cos(w)) * step_time;
-  double delta_th = vth * step_time;
-
+  delta_x = (vx * cos(w) - vy * sin(w)) * step_time;
+  delta_y = (vx * sin(w) + vy * cos(w)) * step_time;
+  
   odom_pose[0] += delta_x;
   odom_pose[1] += delta_y;
   odom_pose[2] += delta_theta;
@@ -407,14 +412,25 @@ ros::Time rosNow()
   return nh.now();
 }
 
-void motor_driver::cal_encoderL()
+void motor_driver::cal_encoderFL()
 {
-  mt_driver.read_EncoderL();
+  mt_driver.read_EncoderFL();
 }
 
-void motor_driver::cal_encoderR()
+void motor_driver::cal_encoderFR()
 {
-  mt_driver.read_EncoderR();
+  mt_driver.read_EncoderFR();
+}
+
+
+void motor_driver::cal_encoderBL()
+{
+  mt_driver.read_EncoderBL();
+}
+
+void motor_driver::cal_encoderBR()
+{
+  mt_driver.read_EncoderBR();
 }
 
 /*******************************************************************************
