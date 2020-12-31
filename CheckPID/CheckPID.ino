@@ -8,8 +8,8 @@ void setup()
 {
   motor.init();
   delay(1000);
-  motor.setSetpointBR(0); //cong them 5 vong
-  motor.setSetpointBL(0); // cong them 3.2
+  motor.setSetpointFR(0); //cong them 5 vong
+  motor.setSetpointFL(10); // cong them 3.2
   Serial.begin(9600);
   Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
