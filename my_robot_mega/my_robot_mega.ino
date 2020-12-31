@@ -83,7 +83,7 @@ void loop()
   }
 
   nh.spinOnce();
-  waitForSerialLink(nh.connected());
+  waitForSerialLink(nh.connected());𝜔
 }
 
 void PID()
@@ -348,7 +348,6 @@ bool calcOdometry(double diff_time)
   static double last_theta = 0.0;
   double vx, vy, w; // v = translational velocity [m/s], w = rotational velocity [rad/s]
   double step_time;
-  //char log_msg2[50];
 
   wheel_fl = wheel_fr = wheel_bl = wheel_br = 0.0;
   delta_x = delta_y = delta_theta = theta = 0.0;
@@ -379,13 +378,9 @@ bool calcOdometry(double diff_time)
   norm = mpu.readNormalizeGyro();
   yaw = yaw + norm.ZAxis * step_time;
   theta = yaw * PI / 180;
-  //sprintf(log_msg2, "Setup TF on Odometry [%i]", int(step_time));
-  //nh.loginfo(log_msg2);
   delta_theta = theta - last_theta;
 
   w = delta_theta / step_time;
-  //vx = goal_velocity_from_cmd[LINEARX];
-  //vy = goal_velocity_from_cmd[ANGULAR];
   vx = (mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() + mt_driver.getSpeedBR())*(WHEEL_RADIUS/4);
   vy = (- mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() - mt_driver.getSpeedBR())*(WHEEL_RADIUS/4);
 

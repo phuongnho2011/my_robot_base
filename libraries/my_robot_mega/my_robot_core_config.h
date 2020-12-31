@@ -47,7 +47,7 @@
 
 #define PULSE2RAD                         0.010199976  // 1[pulse] * 2 * 3.14159265359 / 1000 = 0.006283185f
 #define PULSE2RADFR                       0.019039955	// 
-#define radtorpm 9.5 
+#define radtorpm 9.549297 
 
 #define MIN_LINEAR_VELOCITYX  -0.22
 #define MAX_LINEAR_VELOCITYX  0.22
@@ -58,10 +58,10 @@
 #define MIN_ANGULAR_VELOCITY -2.75
 #define MAX_ANGULAR_VELOCITY 2.75
 
-#define WHEEL_RADIUS 0.049 //meter
-#define WHEEL_SEPRATION 0.287 //meter
-#define WHEEL_SEPARATION_WIDTH 0.287
-#define WHEEL_SEPARATION_LENGTH 0.15
+//#define WHEEL_RADIUS 0.049 //meter
+//#define WHEEL_SEPRATION 0.287 //meter
+#define WHEEL_SEPARATION_WIDTH 0.1435 //0.287/2
+#define WHEEL_SEPARATION_LENGTH 0.075 //0.15/2
 
 /*******************************************************************************
 * ROS Parameter
