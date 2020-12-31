@@ -83,7 +83,7 @@ void loop()
   }
 
   nh.spinOnce();
-  waitForSerialLink(nh.connected());𝜔
+  waitForSerialLink(nh.connected());
 }
 
 void PID()
