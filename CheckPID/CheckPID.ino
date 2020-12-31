@@ -8,8 +8,8 @@ void setup()
 {
   motor.init();
   delay(1000);
-  motor.setSetpointR(-10); //cong them 5 vong
-  motor.setSetpointL(10); // cong them 3.2
+  motor.setSetpointBR(0); //cong them 5 vong
+  motor.setSetpointBL(0); // cong them 3.2
   Serial.begin(9600);
   Timer1.initialize(10000);
   Timer1.attachInterrupt(PID);
@@ -17,19 +17,30 @@ void setup()
 
 void loop()
 { 
-  Serial.println(motor.getSpeedR());
-  //Serial.println(motor.getLeftencoder());
+  Serial.println(motor.getSpeedFL());
+  //Serial.println(motor.getFLencoder());
 }
 
-void motor_driver::cal_encoderL()
+void motor_driver::cal_encoderFL()
 {
-  motor.read_EncoderL();
+  motor.DemxungFL();
 }
 
-void motor_driver::cal_encoderR()
+void motor_driver::cal_encoderFR()
 {
-  motor.read_EncoderR();
+  motor.DemxungFR();
 }
+
+void motor_driver::cal_encoderBL()
+{
+  motor.DemxungBL();
+}
+
+void motor_driver::cal_encoderBR()
+{
+  motor.DemxungBR();
+}
+
 
 void PID()
 {

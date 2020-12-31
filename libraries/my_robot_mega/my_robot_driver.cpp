@@ -2,6 +2,7 @@
 
 motor_driver::motor_driver()
 {
+
 }
 
 void motor_driver::init()
@@ -30,6 +31,8 @@ void motor_driver::init()
     pinMode(PWM_BR, OUTPUT);
     pinMode(I0_BR_1, OUTPUT);
     pinMode(I0_BR_2, OUTPUT);
+
+    T = 0.01;
 
     speedFL = 0.00, pre_speedFL = 0.00;
     E1_FL = 0, E1_1_FL = 0, E1_2_FL = 0;
@@ -75,13 +78,13 @@ void motor_driver::DemxungFR()
 {
     if (digitalRead(INTERRUPT_FR_2) == HIGH)
     {
-        pulsesFR--;
-        pulseFR_PID--;
+        pulsesFR++;
+        pulseFR_PID++;
     }
     else
     {
-        pulsesFR++;
-        pulseFR_PID++;
+        pulsesFR--;
+        pulseFR_PID--;
     }
 }
 
@@ -103,13 +106,13 @@ void motor_driver::DemxungBR()
 {
     if (digitalRead(INTERRUPT_BR_2) == HIGH)
     {
-        pulsesBR--;
-        pulseBR_PID--;
+        pulsesBR++;
+        pulseBR_PID++;
     }
     else
     {
-        pulsesBR++;
-        pulseBR_PID++;
+        pulsesBR--;
+        pulseBR_PID--;
     }
 }
 
@@ -117,7 +120,7 @@ void motor_driver::PID()
 {
 
     // ---------------FRONT LEFT PID
-    speedFL = (pulseFL_PID / 616) * (1 / T) * 60;
+    speedFL = (pulseFL_PID / 616.0) * (1.0 / T) * 60;
     speedFL = speedFL * LPF_heso + pre_speedFL * (1 - LPF_heso);
     pre_speedFL = speedFL;
     pulseFL_PID = 0;
