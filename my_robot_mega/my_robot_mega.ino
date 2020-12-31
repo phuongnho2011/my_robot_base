@@ -360,8 +360,8 @@ bool calcOdometry(double diff_time)
 
   wheel_fl = PULSE2RAD * (double)last_diff_pulse[FLEFT];
   wheel_fr = PULSE2RADFR * (double)last_diff_pulse[FRIGHT];
-  wheel_bl = PULSE2RAD * (double)last_diff_pulse[FLEFT];
-  wheel_br = PULSE2RAD * (double)last_diff_pulse[FRIGHT];
+  wheel_bl = PULSE2RAD * (double)last_diff_pulse[BLEFT];
+  wheel_br = PULSE2RAD * (double)last_diff_pulse[BRIGHT];
 
   if (isnan(wheel_fl))
     wheel_fl = 0.0;
@@ -375,12 +375,12 @@ bool calcOdometry(double diff_time)
   if (isnan(wheel_br))
     wheel_br = 0.0;
 
-  //norm = mpu.readNormalizeGyro();
-  //yaw = yaw + norm.ZAxis * step_time;
-  //theta = yaw * PI / 180;
-  //delta_theta = theta - last_theta;
+  norm = mpu.readNormalizeGyro();
+  yaw = yaw + norm.ZAxis * step_time;
+  theta = yaw * PI / 180;
+  delta_theta = theta - last_theta;
 
-  //w = delta_theta / step_time;
+  w = delta_theta / step_time;
   w = (-mt_driver.getSpeedFL() + mt_driver.getSpeedFR() - mt_driver.getSpeedBL() + mt_driver.getSpeedBR())/radtorpm*(WHEEL_RADIUS/(4*(WHEEL_SEPARATION_WIDTH+WHEEL_SEPARATION_LENGTH)));
   vx = (mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() + mt_driver.getSpeedBR())/radtorpm*(WHEEL_RADIUS/4);
   vy = (- mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() - mt_driver.getSpeedBR())/radtorpm*(WHEEL_RADIUS/4);
