@@ -270,7 +270,7 @@ void updateJointStates(void)
   static float joint_states_vel[WHEEL_NUM] = {0.0, 0.0, 0.0, 0.0};
 
   joint_states_pos[FLEFT] = PULSE2RAD * (double)mt_driver.getFLencoder();
-  joint_states_pos[FRIGHT] = PULSE2RAD * (double)mt_driver.getFRencoder();
+  joint_states_pos[FRIGHT] = PULSE2RADFR * (double)mt_driver.getFRencoder();
   joint_states_pos[BLEFT] = PULSE2RAD * (double)mt_driver.getBLencoder();
   joint_states_pos[BRIGHT] = PULSE2RAD * (double)mt_driver.getBRencoder();
 
@@ -312,7 +312,7 @@ void updateMotorInfo(int32_t fleft_pulse, int32_t fright_pulse, int32_t bleft_pu
 
   last_diff_pulse[FRIGHT] = fright_pulse - last_pulse[FRIGHT];
   last_pulse[FRIGHT] = fright_pulse;
-  last_rad[FRIGHT] += PULSE2RAD * (double)last_diff_pulse[FRIGHT];
+  last_rad[FRIGHT] += PULSE2RADFR * (double)last_diff_pulse[FRIGHT];
 
   last_diff_pulse[BLEFT] = bleft_pulse - last_pulse[BLEFT];
   last_pulse[BLEFT] = bleft_pulse;
@@ -360,7 +360,7 @@ bool calcOdometry(double diff_time)
     return false;
 
   wheel_fl = PULSE2RAD * (double)last_diff_pulse[FLEFT];
-  wheel_fr = PULSE2RAD * (double)last_diff_pulse[FRIGHT];
+  wheel_fr = PULSE2RADFR * (double)last_diff_pulse[FRIGHT];
   wheel_bl = PULSE2RAD * (double)last_diff_pulse[FLEFT];
   wheel_br = PULSE2RAD * (double)last_diff_pulse[FRIGHT];
 

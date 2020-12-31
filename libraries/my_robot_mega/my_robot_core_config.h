@@ -29,7 +29,7 @@
 #define CONTROL_MOTOR_SPEED_FREQUENCY          10      /*!< Frequency in Hz to control motor */
 #define CONTROL_MOTOR_TIMEOUT                  800     /*!< Period in ms to check control motor timeout */
 #define CMD_VEL_PUBLISH_FREQUENCY              5       	/*!< Frequency in Hz to publish robot velocity */
-#define DRIVE_INFORMATION_PUBLISH_FREQUENCY    6   	/*!< Frequency in Hz to publish drive information */
+#define DRIVE_INFORMATION_PUBLISH_FREQUENCY    5   	/*!< Frequency in Hz to publish drive information */
 // #define IMU_CALCULATE_FREQUENCY                15
 // #define DEBUG_LOG_FREQUENCY                    10       /*!< Frequency in Hz to send log debug messages */
 
@@ -46,6 +46,7 @@
 #define ANGULAR          2                       /*!< Angular velocity index */
 
 #define PULSE2RAD                         0.010199976  // 1[pulse] * 2 * 3.14159265359 / 1000 = 0.006283185f
+#define PULSE2RADFR                       0.019039955	// 
 #define radtorpm 9.5 
 
 #define MIN_LINEAR_VELOCITYX  -0.22

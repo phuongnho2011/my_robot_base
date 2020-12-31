@@ -42,7 +42,7 @@ void motor_driver::init()
     speedFR = 0.00, pre_speedFR = 0.00;
     E1_FR = 0, E1_1_FR = 0, E1_2_FR = 0;
     OutputFR = 0, LastOutputFR = 0;
-    KpFR = 1000, KiFR = 23.0, KdFR = 15.0;
+    KpFR = 800, KiFR = 18.0, KdFR = 10.0;
 
     speedBL = 0.00, pre_speedBL = 0.00;
     E1_BL = 0, E1_1_BL = 0, E1_2_BL = 0;
@@ -78,13 +78,13 @@ void motor_driver::DemxungFR()
 {
     if (digitalRead(INTERRUPT_FR_2) == HIGH)
     {
-        pulsesFR++;
-        pulseFR_PID++;
+        pulsesFR--;
+        pulseFR_PID--;
     }
     else
     {
-        pulsesFR--;
-        pulseFR_PID--;
+        pulsesFR++;
+        pulseFR_PID++;
     }
 }
 
@@ -137,7 +137,7 @@ void motor_driver::PID()
 
     // ---------------FRONT RIGHT PID
 
-    speedFR = (pulseFR_PID / 616) * (1 / T) * 60;
+    speedFR = (pulseFR_PID / 330) * (1 / T) * 60;
     speedFR = speedFR * LPF_heso + pre_speedFR * (1 - LPF_heso);
     pre_speedFR = speedFR;
     pulseFR_PID = 0;
