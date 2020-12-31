@@ -37,17 +37,17 @@ void motor_driver::init()
     speedFL = 0.00, pre_speedFL = 0.00;
     E1_FL = 0, E1_1_FL = 0, E1_2_FL = 0;
     OutputFL = 0, LastOutputFL = 0;
-    KpFL = 1000, KiFL = 23.0, KdFL = 15.0;
+    KpFL = 900, KiFL = 23.0, KdFL = 15.0;
 
     speedFR = 0.00, pre_speedFR = 0.00;
     E1_FR = 0, E1_1_FR = 0, E1_2_FR = 0;
     OutputFR = 0, LastOutputFR = 0;
-    KpFR = 800, KiFR = 18.0, KdFR = 10.0;
+    KpFR = 950, KiFR = 18.0, KdFR = 10.0;
 
     speedBL = 0.00, pre_speedBL = 0.00;
     E1_BL = 0, E1_1_BL = 0, E1_2_BL = 0;
     OutputBL = 0, LastOutputBL = 0;
-    KpBL = 1000, KiBL = 23.0, KdBL = 15.0;
+    KpBL = 900, KiBL = 23.0, KdBL = 15.0;
 
     speedBR = 0.00, pre_speedBR = 0.00;
     E1_BR = 0, E1_1_BR = 0, E1_2_BR = 0;
