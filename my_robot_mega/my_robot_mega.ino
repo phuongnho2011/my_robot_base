@@ -354,6 +354,7 @@ bool calcOdometry(double diff_time)
   vx = vy = w = 0.0;
   step_time = 0;
   step_time = diff_time;
+  char log_msg2[50];
 
   if (step_time == 0)
     return false;
@@ -377,6 +378,8 @@ bool calcOdometry(double diff_time)
 
   norm = mpu.readNormalizeGyro();
   yaw = yaw + norm.ZAxis * step_time;
+  sprintf(log_msg2, "Setup TF on Odometry [%i]", int(yaw));
+  nh.loginfo(log_msg2);
   theta = yaw * PI / 180;
   delta_theta = theta - last_theta;
 
