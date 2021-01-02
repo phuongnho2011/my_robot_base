@@ -354,7 +354,7 @@ bool calcOdometry(double diff_time)
   vx = vy = w = 0.0;
   step_time = 0;
   step_time = diff_time;
-  char log_msg2[50];
+  //char log_msg2[50];
 
   if (step_time == 0)
     return false;
@@ -378,15 +378,15 @@ bool calcOdometry(double diff_time)
 
   norm = mpu.readNormalizeGyro();
   yaw = yaw + norm.ZAxis * step_time;
-  sprintf(log_msg2, "Setup TF on Odometry [%i]", int(yaw));
-  nh.loginfo(log_msg2);
+  //sprintf(log_msg2, "Setup TF on Odometry [%i]", int(yaw));
+  //nh.loginfo(log_msg2);
   theta = yaw * PI / 180;
   delta_theta = theta - last_theta;
 
   w = delta_theta / step_time;
   //w = (-mt_driver.getSpeedFL() + mt_driver.getSpeedFR() - mt_driver.getSpeedBL() + mt_driver.getSpeedBR())*2*PI*WHEEL_RADIUS/60*(WHEEL_RADIUS/(4*(WHEEL_SEPARATION_WIDTH+WHEEL_SEPARATION_LENGTH)));
-  vx = (mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() + mt_driver.getSpeedBR())*2*PI*WHEEL_RADIUS/60*(WHEEL_RADIUS/4);
-  vy = (- mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() - mt_driver.getSpeedBR())*2*PI*WHEEL_RADIUS/60*(WHEEL_RADIUS/4);
+  vx = (mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() + mt_driver.getSpeedBR())/radtorpm*(WHEEL_RADIUS/4);
+  vy = (- mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() - mt_driver.getSpeedBR())/radtorpm*(WHEEL_RADIUS/4);
 
   delta_x = (vx * cos(w) - vy * sin(w)) * step_time;
   delta_y = (vx * sin(w) + vy * cos(w)) * step_time;
