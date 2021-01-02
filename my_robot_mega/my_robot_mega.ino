@@ -42,6 +42,8 @@ void setup()
 
 char test[50];
 unsigned int t, temp;
+float yaw = 0;
+Vector norm;
 void loop()
 {
   delayMicroseconds(300);
@@ -341,8 +343,6 @@ void commandVelocityCallback(const geometry_msgs::Twist &cmd_vel_msg)
 
 bool calcOdometry(double diff_time)
 {
-  float yaw = 0;
-  Vector norm;
   double wheel_fl, wheel_fr, wheel_bl, wheel_br; // rotation value of wheel [rad]
   double delta_x, delta_y, theta, delta_theta;
   static double last_theta = 0.0;
