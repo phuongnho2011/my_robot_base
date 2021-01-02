@@ -388,8 +388,8 @@ bool calcOdometry(double diff_time)
   vx = (mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() + mt_driver.getSpeedBR())/radtorpm*(WHEEL_RADIUS/4);
   vy = (- mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() - mt_driver.getSpeedBR())/radtorpm*(WHEEL_RADIUS/4);
 
-  delta_x = (vx * cos(odom[2]) - vy * sin(odom[2])) * step_time;
-  delta_y = (vx * sin(odom[2]) + vy * cos(odom[2])) * step_time;
+  delta_x = (vx * cos(odom_pose[2]) - vy * sin(odom_pose[2])) * step_time;
+  delta_y = (vx * sin(odom_pose[2]) + vy * cos(odom_pose[2])) * step_time;
   //delta_theta = w*step_time;
 
   odom_pose[0] += delta_x;
