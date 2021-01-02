@@ -46,7 +46,6 @@ float yaw = 0;
 Vector norm;
 void loop()
 {
-  delayMicroseconds(300);
   uint32_t t = millis();
   updateTime();
   updateVariable(nh.connected());
