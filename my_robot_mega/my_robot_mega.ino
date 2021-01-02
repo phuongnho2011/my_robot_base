@@ -192,6 +192,8 @@ void publishDriveInformation(void)
   updateJointStates();
   joint_states.header.stamp = stamp_now;
   joint_states_pub.publish(&joint_states);
+
+  nh.spinOnce();
 }
 
 /*******************************************************************************
