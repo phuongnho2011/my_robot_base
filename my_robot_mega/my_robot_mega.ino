@@ -381,9 +381,9 @@ bool calcOdometry(double diff_time)
   delta_theta = theta - last_theta;
 
   //w = delta_theta / step_time;
-  w = (-mt_driver.getSpeedFL() + mt_driver.getSpeedFR() - mt_driver.getSpeedBL() + mt_driver.getSpeedBR())/radtorpm*2*PI*WHEEL_RADIUS/60*(WHEEL_RADIUS/(4*(WHEEL_SEPARATION_WIDTH+WHEEL_SEPARATION_LENGTH)));
-  vx = (mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() + mt_driver.getSpeedBR())/radtorpm*2*PI*WHEEL_RADIUS/60*(WHEEL_RADIUS/4);
-  vy = (- mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() - mt_driver.getSpeedBR())/radtorpm*2*PI*WHEEL_RADIUS/60*(WHEEL_RADIUS/4);
+  w = (-mt_driver.getSpeedFL() + mt_driver.getSpeedFR() - mt_driver.getSpeedBL() + mt_driver.getSpeedBR())*2*PI*WHEEL_RADIUS/60*(WHEEL_RADIUS/(4*(WHEEL_SEPARATION_WIDTH+WHEEL_SEPARATION_LENGTH)));
+  vx = (mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() + mt_driver.getSpeedBR())*2*PI*WHEEL_RADIUS/60*(WHEEL_RADIUS/4);
+  vy = (- mt_driver.getSpeedFL() + mt_driver.getSpeedFR() + mt_driver.getSpeedBL() - mt_driver.getSpeedBR())*2*PI*WHEEL_RADIUS/60*(WHEEL_RADIUS/4);
 
   delta_x = (vx * cos(w) - vy * sin(w)) * step_time;
   delta_y = (vx * sin(w) + vy * cos(w)) * step_time;
