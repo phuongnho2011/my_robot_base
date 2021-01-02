@@ -85,13 +85,13 @@ void loop()
   }
 
   nh.spinOnce();
+  delay(1);
   waitForSerialLink(nh.connected());
 }
 
 void PID()
 {
   mt_driver.PID();
-  nh.spinOnce();
 }
 
 void initJointStates(void)
