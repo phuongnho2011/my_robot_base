@@ -91,6 +91,7 @@ void loop()
 void PID()
 {
   mt_driver.PID();
+  nh.spinOnce();
 }
 
 void initJointStates(void)
