@@ -4,6 +4,9 @@
 #include <my_robot_core_config.h>
 #include <TimerOne.h>
 
+float yaw = 0;
+Vector norm;
+
 void setup()
 {
   // Initialize ROS node handle, advertise and subscribe the topics
@@ -319,8 +322,6 @@ void commandVelocityCallback(const geometry_msgs::Twist &cmd_vel_msg)
 
 bool calcOdometry(double diff_time)
 {
-  float yaw = 0;
-  Vector norm;
   double wheel_l, wheel_r; // rotation value of wheel [rad]
   double delta_s, theta, delta_theta;
   static double last_theta = 0.0;
