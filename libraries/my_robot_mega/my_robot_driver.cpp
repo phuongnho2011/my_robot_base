@@ -37,22 +37,22 @@ void motor_driver::init()
     speedFL = 0.00, pre_speedFL = 0.00;
     E1_FL = 0, E1_1_FL = 0, E1_2_FL = 0;
     OutputFL = 0, LastOutputFL = 0;
-    KpFL = 900, KiFL = 23.0, KdFL = 15.0;
+    KpFL = 200.0, KiFL = 120.0, KdFL = 0.001;
 
     speedFR = 0.00, pre_speedFR = 0.00;
     E1_FR = 0, E1_1_FR = 0, E1_2_FR = 0;
     OutputFR = 0, LastOutputFR = 0;
-    KpFR = 950, KiFR = 18.0, KdFR = 10.0;
+    KpFR = 200.0, KiFR = 120.0, KdFR = 0.001;
 
     speedBL = 0.00, pre_speedBL = 0.00;
     E1_BL = 0, E1_1_BL = 0, E1_2_BL = 0;
     OutputBL = 0, LastOutputBL = 0;
-    KpBL = 900, KiBL = 23.0, KdBL = 15.0;
+    KpBL = 200, KiBL = 120.0, KdBL = 0.001;
 
     speedBR = 0.00, pre_speedBR = 0.00;
     E1_BR = 0, E1_1_BR = 0, E1_2_BR = 0;
     OutputBR = 0, LastOutputBR = 0;
-    KpBR = 1000, KiBR = 23.0, KdBR = 15.0;
+    KpBR = 200, KiBR = 120.0, KdBR = 0.001;
 
     attachInterrupt(0, cal_encoderFL, FALLING);
     attachInterrupt(1, cal_encoderFR, FALLING);
