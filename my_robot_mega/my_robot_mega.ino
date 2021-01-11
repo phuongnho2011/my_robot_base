@@ -47,6 +47,7 @@ char test[50];
 unsigned int t, temp;
 void loop()
 {
+  //delayMicroseconds(30);
   uint32_t t = millis();
   updateTime();
   updateVariable(nh.connected());
@@ -77,7 +78,7 @@ void loop()
   }
 
   nh.spinOnce();
-  delay(0.5);
+  delay(1);
   waitForSerialLink(nh.connected());
 }
 

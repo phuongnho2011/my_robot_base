@@ -24,12 +24,12 @@ void motor_driver::init()
     speedR = 0.00, pre_speedR = 0.00;
     E1_R = 0, E1_1_R = 0, E1_2_R = 0;
     OutputR = 0, LastOutputR = 0;
-    KpR = 200.0, KiR = 120.0,KdR=0.001;
+    KpR = 1000.0, KdR ;
 
     speedL = 0.00, pre_speedL = 0.00;
     E1_L = 0, E1_1_L = 0, E1_2_L = 0;
     OutputL = 0, LastOutputL = 0;
-    KpL = 200, KiL = 120.0,KdL=0.001;
+    KpL = 1000, KdL = 23.0, KiL = 8.0;
 
     //attachInterrupt(digitalPinToInterrupt(A1), cal_encoderL, FALLING);
     //attachInterrupt(digitalPinToInterrupt(A2), cal_encoderR, FALLING);
