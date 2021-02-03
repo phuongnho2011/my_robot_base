@@ -2,6 +2,7 @@
 #include <my_imu2.h>
 
 // SoftwareWire Wire(A2, A3);
+// Them thu de commit
 
 my_imu::my_imu(int addr)
 {
