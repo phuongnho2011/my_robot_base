@@ -1,14 +1,33 @@
-#include <ros.h>
-#include <geometry_msgs/Twist.h>
+#include <my_robot_core_config.h>
 
+#define EN_L 4
 #define EN_R 5
-#define EN_L 6
 
-#define INT1_R 7
-#define INT2_R 11
+#define INT1_L 23
+#define INT2_L 25
 
-#define INT1_L 12
-#define INT2_L 13
+#define INT1_R 27
+#define INT2_R 29
+
+#define A1 2
+#define B1 39
+
+#define A2 3
+#define B2 41
+
+#define SAMPLE_DELAY 1000
+#define PULSES_PER_TURN 181.5
+
+unsigned int lastTime;
+float rpm;
+volatile unsigned int pulseL ,pulseR;
+
+char log_msg[50];
+char result[8];
+
+unsigned long previousTime = 0;
+unsigned long Time;
+float velocity;
 
 double w_r = 0, w_l = 0;
 //wheel_rad is the wheel radius ,wheel_sep is
@@ -18,12 +37,16 @@ int lowSpeed = 200;
 int highSpeed = 50; 
 double speed_ang = 0, speed_lin = 0;
 
+
 //Motor_initalization
 void Motor_init();
 
 //Control_Motor
 void Motor_right(int Pulse_Width);
 void Motor_left(int Pulse_Width);
+void Count_Left();
+void Count_Right();
+void Calculate_Velocity();
 
 void messageCb( const geometry_msgs::Twist& msg) {
   speed_ang = msg.angular.z;
@@ -36,20 +59,21 @@ ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", &messageCb );
 
 void setup() {
   Motor_init();
-  nh.initNode();
-  nh.subscribe(sub);
+  attachInterrupt(digitalPinToInterrupt(A1),Count_Left,FALLING);
+  Serial.begin(9600);
 }
 
 void loop() {
-  Motor_right(w_r*10);
-  Motor_left(w_l*10);
-  nh.spinOnce();
+
+
 }
 
 void Motor_init()
 {
-  pinMode(2,INPUT_PULLUP);//chan ngat encoder
-  pinMode(4,INPUT_PULLUP);//chan doc encoder
+  pinMode(A1,INPUT_PULLUP);//chan ngat encoder
+  pinMode(B1,INPUT_PULLUP);//chan doc encoder
+  pinMode(A2,INPUT_PULLUP);//chan ngat encoder
+  pinMode(B2,INPUT_PULLUP);//chan doc encoder
 
   pinMode(EN_R,OUTPUT);//chan pwm
   pinMode(INT1_R,OUTPUT);//chan DIR1
@@ -102,4 +126,10 @@ void Motor_left(int Pulse_Width)
     digitalWrite(INT1_L,LOW);
     digitalWrite(INT2_L,LOW);
   }
+}
+
+void Count_Left()
+{
+     ++pulseL;
+     Serial.print(pulseL);
 }
