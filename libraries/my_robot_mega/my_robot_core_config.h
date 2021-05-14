@@ -26,11 +26,11 @@
 #define CONTROL_MOTOR_TIMEOUT_TIME_INDEX        6       /*!< Time index control motor timeout */
 
 /* Frequency of publish/subscribe */
-#define CONTROL_MOTOR_SPEED_FREQUENCY          10       /*!< Frequency in Hz to control motor */
-#define CONTROL_MOTOR_TIMEOUT                  500      /*!< Period in ms to check control motor timeout */
-#define IMU_PUBLISH_FREQUENCY                  15      	/*!< Frequency in Hz to publish IMU information */
+#define CONTROL_MOTOR_SPEED_FREQUENCY          10      /*!< Frequency in Hz to control motor */
+#define CONTROL_MOTOR_TIMEOUT                  800     /*!< Period in ms to check control motor timeout */
 #define CMD_VEL_PUBLISH_FREQUENCY              5       	/*!< Frequency in Hz to publish robot velocity */
-#define DRIVE_INFORMATION_PUBLISH_FREQUENCY    5       	/*!< Frequency in Hz to publish drive information */
+#define DRIVE_INFORMATION_PUBLISH_FREQUENCY    5     	/*!< Frequency in Hz to publish drive information */
+#define IMU_CALCULATE_FREQUENCY                15
 #define DEBUG_LOG_FREQUENCY                    10       /*!< Frequency in Hz to send log debug messages */
 
 /* Linear & Angular velocity index */
@@ -42,16 +42,23 @@
 #define LINEAR          0                       /*!< Linear velocity index */
 #define ANGULAR         1                       /*!< Angular velocity index */
 
-#define PULSE2RAD                         0.005099988  // 1[pulse] * 3.14159265359 / 1232 = 0.001533981f
+#define PULSE2RADR                         0.006283185  // 1[pulse] * 2 * 3.14159265359 / 1000 = 0.010199976f
+#define PULSE2RADL                         0.006283185 
 
-#define MIN_LINEAR_VELOCITY -2 
-#define MAX_LINEAR_VELOCITY  2
+//#define MIN_LINEAR_VELOCITY  -7.01
+//#define MAX_LINEAR_VELOCITY  7.01
 
-#define MIN_ANGULAR_VELOCITY -1
-#define MAX_ANGULAR_VELOCITY 1
+#define MIN_LINEAR_VELOCITY  -0.22
+#define MAX_LINEAR_VELOCITY  0.22
 
-#define WHEEL_RADIUS 0.0275 //meter
-#define WHEEL_SEPRATION 0.318 //meter
+//#define MIN_ANGULAR_VELOCITY -0.3
+//#define MAX_ANGULAR_VELOCITY 0.3
+
+#define MIN_ANGULAR_VELOCITY -2.75
+#define MAX_ANGULAR_VELOCITY 2.75
+
+#define WHEEL_RADIUS 0.022 //meter
+#define WHEEL_SEPRATION 0.287 //meter
 
 /*******************************************************************************
 * ROS Parameter
@@ -119,7 +126,7 @@ tf::TransformBroadcaster tf_broadcaster;
 // /*******************************************************************************
 // * SoftwareTimer of Turtlebot3
 // *******************************************************************************/
-static uint32_t tTime[10];
+static double tTime[10];
 
 /*******************************************************************************
 * Calculation for odometry
@@ -151,7 +158,9 @@ float goal_velocity_from_button[WHEEL_NUM] = {0.0, 0.0};
 float goal_velocity_from_cmd[WHEEL_NUM] = {0.0, 0.0};
 float goal_velocity_from_rc100[WHEEL_NUM] = {0.0, 0.0};
 
-my_imu imu(0x68);
+//MPU9250 mpu;
+
+MPU6050 mpu;
 
 motor_driver mt_driver;
 
