@@ -29,9 +29,9 @@
 #define CONTROL_MOTOR_SPEED_FREQUENCY          10      /*!< Frequency in Hz to control motor */
 #define CONTROL_MOTOR_TIMEOUT                  800     /*!< Period in ms to check control motor timeout */
 #define CMD_VEL_PUBLISH_FREQUENCY              5       	/*!< Frequency in Hz to publish robot velocity */
-#define DRIVE_INFORMATION_PUBLISH_FREQUENCY    5     	/*!< Frequency in Hz to publish drive information */
-#define IMU_CALCULATE_FREQUENCY                15
-#define DEBUG_LOG_FREQUENCY                    10       /*!< Frequency in Hz to send log debug messages */
+#define DRIVE_INFORMATION_PUBLISH_FREQUENCY    5   	/*!< Frequency in Hz to publish drive information */
+// #define IMU_CALCULATE_FREQUENCY                15
+// #define DEBUG_LOG_FREQUENCY                    10       /*!< Frequency in Hz to send log debug messages */
 
 /* Linear & Angular velocity index */
 #define WHEEL_NUM       2                       /*!< Num wheel */

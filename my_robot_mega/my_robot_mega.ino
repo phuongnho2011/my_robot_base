@@ -47,13 +47,19 @@ char test[50];
 unsigned int t, temp;
 void loop()
 {
-  delayMicroseconds(300);
   uint32_t t = millis();
   updateTime();
   updateVariable(nh.connected());
   updateTFPrefix(nh.connected());
 
-  if ((t - tTime[0]) >= CONTROL_MOTOR_SPEED_FREQUENCY)
+  if ((t - tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
+  {
+    updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
+    publishDriveInformation();
+    tTime[2] = t;
+  }
+
+  if ((t - tTime[0]) >= (1000/CONTROL_MOTOR_SPEED_FREQUENCY))
   {
     if (t - tTime[6] > CONTROL_MOTOR_TIMEOUT)
     {
@@ -64,25 +70,14 @@ void loop()
     }
     else
     {
-      mt_driver.setSetpointL((goal_velocity_from_cmd[LINEAR] - goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 3.2);
-      mt_driver.setSetpointR((goal_velocity_from_cmd[LINEAR] + goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60 + 5);
+      mt_driver.setSetpointL((goal_velocity_from_cmd[LINEAR] - goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60);
+      mt_driver.setSetpointR((goal_velocity_from_cmd[LINEAR] + goal_velocity_from_cmd[ANGULAR] * WHEEL_SEPRATION / 2) / (2 * 3.14159265359 * WHEEL_RADIUS) * 60);
     }
     tTime[0] = t;
   }
 
-  if ((t - tTime[2]) >= (1000 / DRIVE_INFORMATION_PUBLISH_FREQUENCY))
-  {
-    updateMotorInfo(mt_driver.getLeftencoder(), mt_driver.getRightencoder());
-    publishDriveInformation();
-    tTime[2] = t;
-  }
-
-  // if ((t - tTime[3]) >= (1000 / IMU_CALCULATE_FREQUENCY))
-  // {
-  //   //mpu.update();
-  //   tTime[3] = t;
-  // }
   nh.spinOnce();
+  delay(0.5);
   waitForSerialLink(nh.connected());
 }
 
@@ -164,9 +159,13 @@ void publishDriveInformation(void)
 {
   unsigned long time_now = millis();
   unsigned long step_time = time_now - prev_update_time;
+  // char log_msg2[50];
 
   prev_update_time = time_now;
   ros::Time stamp_now = rosNow();
+
+  // sprintf(log_msg2, "Setup TF on Odometry [%i]", int(step_time));
+  // nh.loginfo(log_msg2);
 
   calcOdometry((double)step_time * 0.001);
 
@@ -248,10 +247,6 @@ void updateVariable(bool isConnected)
     if (variable_flag == false)
     {
       initOdom();
-      // delay(2000);
-      // mpu.calibrateAccelGyro();
-      // nh.loginfo("Start Calibration Megneto");
-      // mpu.calibrateMag();
       variable_flag = true;
     }
   }
@@ -278,7 +273,7 @@ void updateJointStates(void)
 
 void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
 {
-  int32_t current_pulse = 0;
+  //int32_t current_pulse = 0;
   static int32_t last_pulse[WHEEL_NUM] = {0, 0};
 
   if (init_encoder)
@@ -298,16 +293,16 @@ void updateMotorInfo(int32_t left_pulse, int32_t right_pulse)
     return;
   }
 
-  current_pulse = left_pulse;
+  //current_pulse = left_pulse;
 
-  last_diff_pulse[LEFT] = current_pulse - last_pulse[LEFT];
-  last_pulse[LEFT] = current_pulse;
+  last_diff_pulse[LEFT] = left_pulse - last_pulse[LEFT];
+  last_pulse[LEFT] = left_pulse;
   last_rad[LEFT] += PULSE2RADL * (double)last_diff_pulse[LEFT];
 
-  current_pulse = right_pulse;
+  //current_pulse = right_pulse;
 
-  last_diff_pulse[RIGHT] = current_pulse - last_pulse[RIGHT];
-  last_pulse[RIGHT] = current_pulse;
+  last_diff_pulse[RIGHT] = right_pulse - last_pulse[RIGHT];
+  last_pulse[RIGHT] = right_pulse;
   last_rad[RIGHT] += PULSE2RADR * (double)last_diff_pulse[RIGHT];
 }
 
@@ -327,7 +322,6 @@ void commandVelocityCallback(const geometry_msgs::Twist &cmd_vel_msg)
 
 bool calcOdometry(double diff_time)
 {
-  // char log_msg2[50];
   double wheel_l, wheel_r; // rotation value of wheel [rad]
   double delta_s, theta, delta_theta;
   static double last_theta = 0.0;
@@ -354,9 +348,7 @@ bool calcOdometry(double diff_time)
 
   delta_s = WHEEL_RADIUS * (wheel_r + wheel_l) / 2.0;
   norm = mpu.readNormalizeGyro();
-  yaw = yaw + norm.ZAxis * (step_time);
-  // sprintf(log_msg2, "Setup TF on Odometry [%i]", int(yaw));
-  // nh.loginfo(log_msg2);
+  yaw = yaw + norm.ZAxis * step_time;
   theta = yaw * PI / 180;
   delta_theta = theta - last_theta;
 
